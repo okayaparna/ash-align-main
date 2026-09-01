@@ -56,37 +56,42 @@
 }
 
 :root {
-  --surface-bg: #ebe7de;
-  --surface-elevated: #dddad1;
-  --surface-high: #a2a09a;
+  /* Ground + ink — Ando-derived near-white / graphite */
+  --surface-bg: #fcfcfc;
+  --surface-elevated: #f1f0ed;
+  --surface-high: #e7e4dd;
+  --hairline: rgba(0, 0, 0, 0.1);
+  --hairline-strong: rgba(0, 0, 0, 0.18);
 
-  --contrast-strong: #1a1918;
-  --contrast-medium: #464543;
-  --contrast-weak: #807e7a;
-  --contrast-subtle: #63615d;
+  --contrast-strong: #282828;
+  --contrast-medium: #4a4a4a;
+  --contrast-weak: #6b6b6b;
+  --contrast-subtle: #8a8a8a;
 
-  --wood-50: #f8f2ef;
+  /* Phase accents — retained as semantic signal only (labels, ready states,
+     phase cues). Grounds and bubbles are neutral; these no longer fill areas. */
+  --wood-50: #faf6f3;
   --wood-200: #e9d7cb;
-  --wood-500: #ad7049;
-  --wood-600: #855639;
+  --wood-500: #a56b45;
+  --wood-600: #8a5a3a;
   --wood-700: #5f3e28;
   --wood-800: #352317;
 
-  --olive-50: #f3f5e9;
+  --olive-50: #f6f7ef;
   --olive-200: #d9ddb6;
   --olive-600: #5f652f;
   --olive-700: #444822;
 
   --damson-200: #d1ddd7;
-  --damson-500: #648675;
-  --damson-600: #4d675a;
+  --damson-500: #5d7f6e;
+  --damson-600: #4a6355;
   --damson-700: #374940;
   --damson-800: #1f2924;
 
   --radius-sm: 8px;
   --radius-md: 16px;
   --radius-lg: 24px;
-  --radius-pill: 32px;
+  --radius-pill: 999px;
 }
 
 body {
@@ -103,7 +108,65 @@ button {
 }
 
 .font-display {
-  font-family: "Libre Baskerville", "PP Fragment Glare", serif;
+  font-family: "Instrument Serif", "Libre Baskerville", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Sub-headers: sans, larger + bolder (not serif) */
+.ui-subhead {
+  font-family: "Google Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 26px;
+  letter-spacing: -0.011em;
+  color: var(--contrast-strong);
+}
+
+/* Hairline pill button */
+.ui-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--contrast-strong);
+  font-family: inherit;
+  font-size: 16px;
+  padding: 10px 20px;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.ui-pill:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: var(--hairline-strong);
+}
+.ui-pill:disabled { opacity: 0.4; }
+
+/* Solid counterpart for primary actions */
+.ui-pill-solid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--contrast-strong);
+  color: var(--surface-bg);
+  font-family: inherit;
+  font-size: 16px;
+  padding: 11px 21px;
+  transition: opacity 160ms ease;
+}
+.ui-pill-solid:hover:not(:disabled) { opacity: 0.85; }
+.ui-pill-solid:disabled { opacity: 0.35; }
+
+/* Circular arrow badge used inside pills */
+.ui-arrow {
+  width: 28px; height: 28px; border-radius: 999px;
+  background: var(--contrast-strong); color: var(--surface-bg);
+  display: grid; place-items: center; flex: none;
 }
 
 @keyframes fade-in {
@@ -121,4 +184,67 @@ button {
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+
+/* ---------- Landing hero (splash) ---------- */
+.splash-bub {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  animation: splash-rise 620ms ease-out forwards;
+}
+.splash-bub-l { left: 0; }
+.splash-bub-r { right: 0; flex-direction: row-reverse; }
+.splash-bub-c { left: 50%; animation-name: splash-rise-c; }
+.splash-av {
+  width: 26px; height: 26px; border-radius: 999px; flex: none;
+  background: var(--surface-elevated);
+  border: 1px solid var(--hairline);
+  display: grid; place-items: center;
+  font-size: 11px; color: var(--contrast-weak);
+}
+.splash-av.ash {
+  background: var(--contrast-strong);
+  color: var(--surface-bg);
+  border-color: var(--contrast-strong);
+}
+.splash-msg {
+  background: var(--surface-elevated);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 7px 15px;
+  font-size: 14px;
+  color: var(--contrast-strong);
+  white-space: nowrap;
+}
+.splash-msg.ash {
+  background: var(--surface-bg);
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: 16px;
+}
+@keyframes splash-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes splash-rise-c {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Drop cap on the opening paragraph */
+.splash-lead::first-letter {
+  float: left;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: 60px;
+  line-height: 46px;
+  padding: 6px 10px 0 0;
+  color: var(--contrast-strong);
+}
+
+@media (max-width: 640px) {
+  .splash-msg { font-size: 13px; padding: 6px 12px; white-space: normal; }
+  .splash-bub { max-width: 78%; }
 }

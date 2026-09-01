@@ -63,8 +63,8 @@ function RadioGroup({
             onClick={() => onChange(opt)}
             className={`flex h-[64px] cursor-pointer items-center rounded-[16px] px-[16px] font-body text-[16px] font-normal leading-[1.5] transition-colors ${
               selected
-                ? "bg-[#a66c94] text-[#ebe7de]"
-                : "bg-[#dddad1] text-[#1a1918]"
+                ? "bg-[#a66c94] text-[#fcfcfc]"
+                : "bg-[#f1f0ed] text-[#282828]"
             }`}
           >
             {opt}
@@ -77,8 +77,8 @@ function RadioGroup({
           onClick={() => onChange("__other__")}
           className={`flex h-[64px] cursor-pointer items-center rounded-[16px] px-[16px] font-body text-[16px] font-normal leading-[1.5] transition-colors ${
             other.enabled && value === "__other__"
-              ? "bg-[#a66c94] text-[#ebe7de]"
-              : "bg-[#dddad1] text-[#1a1918]"
+              ? "bg-[#a66c94] text-[#fcfcfc]"
+              : "bg-[#f1f0ed] text-[#282828]"
           }`}
         >
           {other.enabled && value === "__other__" ? (
@@ -91,7 +91,7 @@ function RadioGroup({
               }}
               onClick={(e) => e.stopPropagation()}
               autoFocus
-              className="w-full bg-transparent font-body text-[16px] text-[#ebe7de] outline-none placeholder:text-[#ebe7de]/60"
+              className="w-full bg-transparent font-body text-[16px] text-[#fcfcfc] outline-none placeholder:text-[#fcfcfc]/60"
             />
           ) : (
             other.placeholder
@@ -121,8 +121,8 @@ function LikertScale({
             onClick={() => onChange(n)}
             className={`flex h-11 w-11 items-center justify-center rounded-lg font-body text-[16px] font-medium transition-colors ${
               value === n
-                ? "bg-[#a66c94] text-[#ebe7de]"
-                : "bg-[#dddad1] text-[#1a1918]"
+                ? "bg-[#a66c94] text-[#fcfcfc]"
+                : "bg-[#f1f0ed] text-[#282828]"
             }`}
             aria-label={`${n} - ${LIKERT_LABELS[n - 1] || ""}`}
           >
@@ -184,12 +184,12 @@ export default function PreSurvey({ onComplete, roomId }: PreSurveyProps) {
   };
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-[#ebe7de]">
+    <div className="flex min-h-[100dvh] flex-col bg-[#fcfcfc]">
       <div className="animate-fade-in flex flex-col gap-3 px-6 pt-20 text-center lg:mx-auto lg:max-w-[600px]">
-        <h1 className="font-display text-[32px] font-medium leading-[1.4] tracking-[-1px] text-[#8e521f]">
+        <h1 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
           Help Ash understand your relationship
         </h1>
-        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#464543]">
+        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#4a4a4a]">
           5 quick questions help Ash personalize your session. Your responses
           are anonymous and used for research only.
         </p>
@@ -198,7 +198,7 @@ export default function PreSurvey({ onComplete, roomId }: PreSurveyProps) {
       <div className="mx-auto mt-8 flex w-full max-w-[600px] flex-col gap-8 px-6 pb-8">
         {/* Age */}
         <fieldset className="flex flex-col gap-3">
-          <legend className="font-display text-[32px] font-medium leading-[1.4] tracking-[-1px] text-[#8e521f] text-center">
+          <legend className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)] text-center">
             What is your age?
           </legend>
           <RadioGroup name="age" options={AGE_OPTIONS} value={age} onChange={setAge} />
@@ -206,7 +206,7 @@ export default function PreSurvey({ onComplete, roomId }: PreSurveyProps) {
 
         {/* Gender */}
         <fieldset className="flex flex-col gap-3">
-          <legend className="font-display text-[32px] font-medium leading-[1.4] tracking-[-1px] text-[#8e521f] text-center">
+          <legend className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)] text-center">
             What is your gender?
           </legend>
           <RadioGroup
@@ -225,7 +225,7 @@ export default function PreSurvey({ onComplete, roomId }: PreSurveyProps) {
 
         {/* Relationship */}
         <fieldset className="flex flex-col gap-3">
-          <legend className="font-display text-[32px] font-medium leading-[1.4] tracking-[-1px] text-[#8e521f] text-center">
+          <legend className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)] text-center">
             What is the nature of your relationship to the person you&apos;ll be
             chatting with today?
           </legend>
@@ -245,7 +245,7 @@ export default function PreSurvey({ onComplete, roomId }: PreSurveyProps) {
 
         {/* Likert: Satisfaction */}
         <fieldset className="flex flex-col gap-3">
-          <legend className="font-display text-[32px] font-medium leading-[1.4] tracking-[-1px] text-[#8e521f] text-center">
+          <legend className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)] text-center">
             Please indicate how much you agree or disagree with the following
             statements:
           </legend>
@@ -278,7 +278,7 @@ export default function PreSurvey({ onComplete, roomId }: PreSurveyProps) {
         <button
           onClick={handleSubmit}
           disabled={!allAnswered}
-          className="flex h-[64px] w-full items-center justify-center rounded-[16px] bg-[#8e521f] font-body text-[18px] font-medium leading-[1.2] tracking-[-0.25px] text-[#f1d5be] disabled:opacity-40"
+          className="flex h-[64px] w-full items-center justify-center rounded-[var(--radius-pill)] bg-[var(--contrast-strong)] transition-opacity hover:opacity-85 font-body text-[17px] font-medium leading-[1.2] tracking-[-0.011em] text-[var(--surface-bg)] disabled:opacity-40"
         >
           Continue
         </button>

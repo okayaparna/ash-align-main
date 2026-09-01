@@ -32,7 +32,7 @@ function SingleChoiceInput({
 }) {
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="font-display text-[32px] font-medium leading-[1.4] tracking-[-1px] text-[#8e521f] text-center">
+      <h2 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)] text-center">
         {question}
       </h2>
       <div className="mt-4 flex flex-col gap-2">
@@ -46,8 +46,8 @@ function SingleChoiceInput({
               onClick={() => onChange(choice)}
               className={`flex h-[64px] w-full items-center rounded-[16px] px-[16px] text-left font-body text-[16px] font-normal leading-[1.5] transition-colors ${
                 selected
-                  ? "bg-[#a66c94] text-[#ebe7de]"
-                  : "bg-[#dddad1] text-[#1a1918]"
+                  ? "bg-[#a66c94] text-[#fcfcfc]"
+                  : "bg-[#f1f0ed] text-[#282828]"
               }`}
             >
               <span className="flex-1">
@@ -59,7 +59,7 @@ function SingleChoiceInput({
                     onClick={(e) => e.stopPropagation()}
                     placeholder={choice}
                     autoFocus
-                    className="w-full bg-transparent font-body text-[16px] text-[#ebe7de] outline-none placeholder:text-[#ebe7de]/60"
+                    className="w-full bg-transparent font-body text-[16px] text-[#fcfcfc] outline-none placeholder:text-[#fcfcfc]/60"
                   />
                 ) : (
                   choice
@@ -90,7 +90,7 @@ function RatingInput({
 }) {
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="font-display text-[32px] font-medium leading-[1.4] tracking-[-1px] text-[#8e521f] text-center">
+      <h2 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)] text-center">
         {question}
       </h2>
       <div className="mt-4 flex justify-between gap-1.5">
@@ -101,8 +101,8 @@ function RatingInput({
             onClick={() => onChange(n)}
             className={`flex h-11 w-11 items-center justify-center rounded-lg font-body text-[16px] font-medium transition-colors ${
               value === n
-                ? "bg-[#a66c94] text-[#ebe7de]"
-                : "bg-[#dddad1] text-[#1a1918]"
+                ? "bg-[#a66c94] text-[#fcfcfc]"
+                : "bg-[#f1f0ed] text-[#282828]"
             }`}
           >
             {n}
@@ -203,7 +203,7 @@ export default function SurveyScreen({
   };
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-[#ebe7de]">
+    <div className="flex min-h-[100dvh] flex-col bg-[#fcfcfc]">
       <div className="px-6 pt-6">
         <button
           onClick={() => {
@@ -213,12 +213,12 @@ export default function SurveyScreen({
               onBack();
             }
           }}
-          className={`flex h-10 w-10 items-center justify-center rounded-full border border-[#dddad1] ${
+          className={`flex h-10 w-10 items-center justify-center rounded-full border border-[#f1f0ed] ${
             currentIndex === 0 && !onBack ? "invisible" : ""
           }`}
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12.5 15L7.5 10L12.5 5" stroke="#1a1918" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M12.5 15L7.5 10L12.5 5" stroke="#282828" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
       </div>
@@ -233,7 +233,7 @@ export default function SurveyScreen({
                   ? "bg-[#8e521f]"
                   : i < currentIndex
                     ? "bg-[#8e521f]/40"
-                    : "bg-[#dddad1]"
+                    : "bg-[#f1f0ed]"
               }`}
             />
           ))}
@@ -293,7 +293,7 @@ export default function SurveyScreen({
 
         <button
           onClick={handleSkip}
-          className="pb-4 font-body text-[14px] font-bold text-[#807e7a]"
+          className="pb-4 font-body text-[14px] font-bold text-[#6b6b6b]"
         >
           skip
         </button>
@@ -357,7 +357,7 @@ export function PostSurveyCard({
     <div className="w-full py-6">
       {/* Title + subtitle */}
       <div className="mb-6">
-        <h2 className="font-display mb-1 text-center text-[22px] font-medium leading-[1.4] tracking-[-0.5px] text-[#8e521f]">
+        <h2 className="font-display mb-1 text-center text-[24px] leading-[1.2] tracking-[-0.5px] text-[var(--contrast-strong)]">
           {title}
         </h2>
         <p className="text-center text-sm leading-[1.5] text-[var(--contrast-weak)]">
@@ -370,7 +370,7 @@ export function PostSurveyCard({
           if (q.type === "rating") {
             return (
               <div key={i} className="flex flex-col gap-3">
-                <p className="font-display text-center text-[20px] font-medium leading-[1.4] tracking-[-0.5px] text-[var(--contrast-strong)]">
+                <p className="font-display text-center text-[20px] leading-[1.2] tracking-[-0.5px] text-[var(--contrast-strong)]">
                   {q.question}
                 </p>
                 <div className="flex w-full justify-between gap-1.5">
@@ -383,8 +383,8 @@ export function PostSurveyCard({
                       }
                       className={`flex h-11 w-11 items-center justify-center rounded-full font-body text-[16px] font-medium transition-colors duration-200 ${
                         answers[i] === n
-                          ? "bg-[#a66c94] text-[#ebe7de]"
-                          : "bg-[#dddad1] text-[#1a1918]"
+                          ? "bg-[#a66c94] text-[#fcfcfc]"
+                          : "bg-[#f1f0ed] text-[#282828]"
                       }`}
                     >
                       {n}
@@ -406,7 +406,7 @@ export function PostSurveyCard({
           if (q.type === "single_choice") {
             return (
               <div key={i} className="flex flex-col gap-3">
-                <p className="font-display text-center text-[20px] font-medium leading-[1.4] tracking-[-0.5px] text-[var(--contrast-strong)]">
+                <p className="font-display text-center text-[20px] leading-[1.2] tracking-[-0.5px] text-[var(--contrast-strong)]">
                   {q.question}
                 </p>
                 <div className="flex w-full justify-center gap-3">
@@ -419,8 +419,8 @@ export function PostSurveyCard({
                       }
                       className={`flex h-11 items-center justify-center rounded-full px-6 font-body text-[16px] font-medium transition-colors duration-200 ${
                         answers[i] === choice
-                          ? "bg-[#a66c94] text-[#ebe7de]"
-                          : "bg-[#dddad1] text-[#1a1918]"
+                          ? "bg-[#a66c94] text-[#fcfcfc]"
+                          : "bg-[#f1f0ed] text-[#282828]"
                       }`}
                     >
                       {choice}
@@ -434,7 +434,7 @@ export function PostSurveyCard({
           if (q.type === "link") {
             return (
               <div key={i} className="flex flex-col items-center gap-3">
-                <p className="font-display text-center text-[20px] font-medium leading-[1.4] tracking-[-0.5px] text-[var(--contrast-strong)]">
+                <p className="font-display text-center text-[20px] leading-[1.2] tracking-[-0.5px] text-[var(--contrast-strong)]">
                   {q.question}
                 </p>
                 <a
@@ -449,7 +449,7 @@ export function PostSurveyCard({
                       // PostHog not initialized
                     }
                   }}
-                  className="flex h-[56px] w-full items-center justify-center rounded-[16px] bg-[#1a1918] font-body text-[16px] font-medium leading-[1.2] tracking-[-0.25px] text-[#ebe7de]"
+                  className="flex h-[56px] w-full items-center justify-center rounded-[16px] bg-[#282828] font-body text-[16px] font-medium leading-[1.2] tracking-[-0.25px] text-[#fcfcfc]"
                 >
                   {q.linkText}
                 </a>
@@ -460,7 +460,7 @@ export function PostSurveyCard({
           if (q.type === "open_text") {
             return (
               <div key={i} className="flex flex-col gap-2">
-                <p className="font-display text-center text-[20px] font-medium leading-[1.4] tracking-[-0.5px] text-[var(--contrast-strong)]">
+                <p className="font-display text-center text-[20px] leading-[1.2] tracking-[-0.5px] text-[var(--contrast-strong)]">
                   {q.question}
                 </p>
                 <textarea
@@ -473,7 +473,7 @@ export function PostSurveyCard({
                     }))
                   }
                   rows={3}
-                  className="w-full resize-none rounded-[16px] bg-[#dddad1] px-[24px] py-[16px] font-body text-[16px] text-[#1a1918] outline-none placeholder:text-[#1a1918]/40"
+                  className="w-full resize-none rounded-[16px] bg-[#f1f0ed] px-[24px] py-[16px] font-body text-[16px] text-[#282828] outline-none placeholder:text-[#282828]/40"
                 />
               </div>
             );
@@ -482,7 +482,7 @@ export function PostSurveyCard({
           if (q.type === "email") {
             return (
               <div key={i} className="flex flex-col gap-2">
-                <p className="font-display text-center text-[20px] font-medium leading-[1.4] tracking-[-0.5px] text-[var(--contrast-strong)]">
+                <p className="font-display text-center text-[20px] leading-[1.2] tracking-[-0.5px] text-[var(--contrast-strong)]">
                   {q.question}
                 </p>
                 <input
@@ -495,7 +495,7 @@ export function PostSurveyCard({
                       [i]: e.target.value,
                     }))
                   }
-                  className="h-[56px] w-full rounded-[16px] bg-[#dddad1] px-[24px] font-body text-[16px] text-[#1a1918] outline-none placeholder:text-[#1a1918]/40"
+                  className="h-[56px] w-full rounded-[16px] bg-[#f1f0ed] px-[24px] font-body text-[16px] text-[#282828] outline-none placeholder:text-[#282828]/40"
                 />
                 <p className="text-xs leading-[1.5] text-[var(--contrast-subtle)]">
                   {q.disclaimer}

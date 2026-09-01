@@ -84,7 +84,7 @@ export default function FinishedScreen({
     <div className="relative min-h-[100dvh] overflow-hidden bg-[var(--surface-bg)]">
       <div className="relative z-10 mx-auto flex max-w-[600px] flex-col items-center px-6 pt-[73px] pb-16">
         <h1
-          className="font-display max-w-[480px] text-center text-[32px] font-medium leading-[1.4] tracking-[-1px] text-[#8e521f]"
+          className="font-display max-w-[480px] text-center text-[34px] leading-[1.2] tracking-[-1px] text-[var(--contrast-strong)]"
         >
           Thank you for completing your session
         </h1>

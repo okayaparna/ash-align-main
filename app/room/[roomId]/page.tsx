@@ -111,7 +111,7 @@ function SplashScreen({ onBegin }: { onBegin: () => void }) {
             type="checkbox"
             checked={consentChecked}
             onChange={(e) => setConsentChecked(e.target.checked)}
-            className="mt-0.5 h-[17px] w-[17px] shrink-0 cursor-pointer rounded-[4px] border-[#464543] accent-[#8e521f]"
+            className="mt-0.5 h-[17px] w-[17px] shrink-0 cursor-pointer rounded-[4px] border-[#4a4a4a] accent-[#8e521f]"
           />
           <span className="font-body text-[12px] font-normal leading-[1.5] text-[var(--contrast-weak)]">
             I am 18 or older, and I agree to the{" "}
@@ -129,7 +129,7 @@ function SplashScreen({ onBegin }: { onBegin: () => void }) {
         <button
           onClick={onBegin}
           disabled={!consentChecked}
-          className="flex h-[64px] w-full items-center justify-center rounded-[16px] bg-[#8e521f] font-body text-[18px] font-medium leading-[1.2] tracking-[-0.25px] text-[#f1d5be] disabled:opacity-40"
+          className="flex h-[64px] w-full items-center justify-center rounded-[var(--radius-pill)] bg-[var(--contrast-strong)] transition-opacity hover:opacity-85 font-body text-[17px] font-medium leading-[1.2] tracking-[-0.011em] text-[var(--surface-bg)] disabled:opacity-40"
         >
           Begin
         </button>
@@ -407,7 +407,7 @@ function StatusBottomBar({ message }: { message: string }) {
   );
 }
 
-function WrapUpIcon({ color = "#A2A09A" }: { color?: string }) {
+function WrapUpIcon({ color = "#8a8a8a" }: { color?: string }) {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="shrink-0">
       <path d="M17.323 18.356l-.54-.54a.52.52 0 00-.422-.177.52.52 0 00-.422.177.52.52 0 00-.177.414c0 .158.059.297.177.415l.917.917a.57.57 0 00.472.206.57.57 0 00.472-.206l2.262-2.221a.52.52 0 00.181-.417.54.54 0 00-.181-.428.54.54 0 00-.427-.177.54.54 0 00-.427.177l-1.885 1.86zM7.135 8.865h9.73a.72.72 0 00.535-.215.72.72 0 00.215-.535.72.72 0 00-.215-.54.72.72 0 00-.535-.21h-9.73a.72.72 0 00-.535.215.72.72 0 00-.215.535c0 .213.071.391.215.535a.72.72 0 00.535.215zM18 22.558a4.53 4.53 0 01-3.187-1.314 4.53 4.53 0 01-1.313-3.186c0-1.249.438-2.311 1.313-3.187A4.53 4.53 0 0118 13.558c1.249 0 2.311.438 3.187 1.313a4.53 4.53 0 011.313 3.187 4.53 4.53 0 01-1.313 3.186A4.53 4.53 0 0118 22.558zM3.5 5.308c0-.499.177-.925.53-1.278A1.74 1.74 0 015.308 3.5h13.384c.499 0 .925.177 1.278.53.353.353.53.779.53 1.278v5.346a.72.72 0 01-.216.535.72.72 0 01-.534.215.72.72 0 01-.535-.215.72.72 0 01-.215-.535V5.308a.3.3 0 00-.096-.212.3.3 0 00-.212-.096H5.308a.3.3 0 00-.212.096.3.3 0 00-.096.212V19.05h6.21c.027.192.064.385.112.577.047.192.103.379.167.562.064.151.032.273-.095.365-.127.093-.248.088-.362-.013l-.162-.123a.47.47 0 00-.292-.112.47.47 0 00-.292.112l-.839.704a.42.42 0 01-.292.112.42.42 0 01-.293-.112l-.838-.704a.47.47 0 00-.293-.112.47.47 0 00-.292.112l-.839.704a.42.42 0 01-.292.112.42.42 0 01-.293-.112l-.838-.704a.47.47 0 00-.293-.112.47.47 0 00-.292.112L3.5 21.394V5.308zM7.135 16.635h3.625a.72.72 0 00.534-.215.72.72 0 00.216-.535.72.72 0 00-.216-.535.72.72 0 00-.534-.215H7.135a.72.72 0 00-.535.216.72.72 0 00-.215.534c0 .213.072.391.215.535a.72.72 0 00.535.215zm0-3.885h6.877a.72.72 0 00.534-.215.72.72 0 00.216-.535.72.72 0 00-.216-.535.72.72 0 00-.534-.215H7.135a.72.72 0 00-.535.216.72.72 0 00-.215.534c0 .213.072.391.215.535a.72.72 0 00.535.215z" fill={color} />
@@ -432,7 +432,7 @@ function WrapUpNotice({
     <div className="flex flex-col gap-4 px-6">
       {onlyPartner && (
         <div className="flex items-start gap-2">
-          <WrapUpIcon color="#A2A09A" />
+          <WrapUpIcon color="#8a8a8a" />
           <p className="text-sm leading-[1.5] text-[var(--contrast-weak)]">
             {partnerName} has indicated that they are ready to{" "}
             <span className="font-bold">wrap up</span> this conversation. When
@@ -443,7 +443,7 @@ function WrapUpNotice({
       )}
       {onlyMe && (
         <div className="flex items-start gap-2">
-          <WrapUpIcon color="#A2A09A" />
+          <WrapUpIcon color="#8a8a8a" />
           <p className="text-sm leading-[1.5] text-[var(--contrast-weak)]">
             You have indicated that you are ready to{" "}
             <span className="font-bold">wrap up</span>. Waiting for{" "}
@@ -641,29 +641,29 @@ export default function RoomPage({
   // Screen 2: Name entry
   if (view === "name") {
     return (
-      <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-[#ebe7de]" style={pageTransition}>
+      <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-[#fcfcfc]" style={pageTransition}>
         <div className="px-6 pt-6">
           <button
             onClick={() => setView("splash")}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#dddad1]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f1f0ed]"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12.5 15L7.5 10L12.5 5" stroke="#1a1918" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12.5 15L7.5 10L12.5 5" stroke="#282828" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
         </div>
 
         <div className="animate-fade-in flex flex-col gap-4 px-6 pt-8 text-center lg:mx-auto lg:max-w-[600px]">
-          <h1 className="font-display text-[32px] font-medium leading-[1.4] tracking-[-1px] text-[#8e521f]">
+          <h1 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
             To begin with,
           </h1>
-          <p className="font-body text-[16px] font-normal leading-[1.5] text-[#464543]">
+          <p className="font-body text-[16px] font-normal leading-[1.5] text-[#4a4a4a]">
             What should Ash call you during the session?
           </p>
         </div>
 
         <div className="relative z-10 mx-auto mt-16 flex w-full max-w-[465px] flex-col gap-3 px-6">
-          <label className="font-body text-[12px] font-medium uppercase leading-[1.2] tracking-[1.25px] text-[#807e7a]">
+          <label className="font-body text-[12px] font-medium uppercase leading-[1.2] tracking-[1.25px] text-[#6b6b6b]">
             Your name
           </label>
           <input
@@ -672,7 +672,7 @@ export default function RoomPage({
             onKeyDown={(e) => {
               if (e.key === "Enter" && name.trim()) setView("survey-intro");
             }}
-            className="h-[64px] rounded-[16px] bg-[#dddad1] px-[24px] font-body text-[16px] text-[#1a1918] outline-none"
+            className="h-[64px] rounded-[16px] bg-[#f1f0ed] px-[24px] font-body text-[16px] text-[#282828] outline-none"
             placeholder="Enter your name"
             autoFocus
           />
@@ -682,7 +682,7 @@ export default function RoomPage({
           <button
             onClick={() => setView("survey-intro")}
             disabled={!name.trim()}
-            className="flex h-[64px] w-full items-center justify-center rounded-[16px] bg-[#8e521f] font-body text-[18px] font-medium leading-[1.2] tracking-[-0.25px] text-[#f1d5be] disabled:opacity-40"
+            className="flex h-[64px] w-full items-center justify-center rounded-[var(--radius-pill)] bg-[var(--contrast-strong)] transition-opacity hover:opacity-85 font-body text-[17px] font-medium leading-[1.2] tracking-[-0.011em] text-[var(--surface-bg)] disabled:opacity-40"
           >
             Continue
           </button>
@@ -699,23 +699,23 @@ export default function RoomPage({
     };
 
     return (
-      <div className="flex min-h-[100dvh] flex-col bg-[#ebe7de]" style={pageTransition}>
+      <div className="flex min-h-[100dvh] flex-col bg-[#fcfcfc]" style={pageTransition}>
         <div className="px-6 pt-6">
           <button
             onClick={() => setView("name")}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#dddad1]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f1f0ed]"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12.5 15L7.5 10L12.5 5" stroke="#1a1918" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12.5 15L7.5 10L12.5 5" stroke="#282828" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
         </div>
 
         <div className="animate-fade-in flex flex-col gap-4 px-6 pt-8 text-center lg:mx-auto lg:max-w-[600px]">
-          <h1 className="font-display text-[32px] font-medium leading-[1.4] tracking-[-1px] text-[#8e521f]">
+          <h1 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
             Alright {name.trim()}, Ash wants to understand your relationship
           </h1>
-          <p className="font-body text-[16px] font-normal leading-[1.5] text-[#464543]">
+          <p className="font-body text-[16px] font-normal leading-[1.5] text-[#4a4a4a]">
             {isSurveyTestVariant() ? "3" : "5"} quick questions help Ash personalize your session. Your responses
             are anonymous and used for research only.
           </p>
@@ -724,13 +724,13 @@ export default function RoomPage({
         <div className="mx-auto mt-16 flex w-full max-w-[465px] flex-col items-center gap-4 px-6">
           <button
             onClick={() => setView("survey")}
-            className="flex h-[64px] w-full items-center justify-center rounded-[16px] bg-[#8e521f] font-body text-[18px] font-medium leading-[1.2] tracking-[-0.25px] text-[#f1d5be]"
+            className="flex h-[64px] w-full items-center justify-center rounded-[var(--radius-pill)] bg-[var(--contrast-strong)] transition-opacity hover:opacity-85 font-body text-[17px] font-medium leading-[1.2] tracking-[-0.011em] text-[var(--surface-bg)]"
           >
             Continue
           </button>
           <button
             onClick={handleSkipSurvey}
-            className="font-body text-[14px] font-bold text-[#807e7a]"
+            className="font-body text-[14px] font-bold text-[#6b6b6b]"
           >
             skip
           </button>
@@ -811,14 +811,14 @@ export default function RoomPage({
     return (
       <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-[var(--surface-bg)] px-6">
         <div className="mx-auto flex max-w-[480px] flex-col items-center gap-6 text-center">
-          <h1 className="font-display text-[28px] font-medium leading-[1.3] tracking-[-1px] text-[var(--wood-700)]">
+          <h1 className="font-display text-[28px] leading-[1.18] tracking-[-1px] text-[var(--wood-700)]">
             This session has ended
           </h1>
-          <p className="text-[16px] leading-[1.6] text-[#464543]">
+          <p className="text-[16px] leading-[1.6] text-[#4a4a4a]">
             This session is no longer active. If you need support, please reach out to a professional.
           </p>
           <div className="mt-2 w-full rounded-[16px] bg-[#f3e8e8] p-6 text-left">
-            <p className="mb-3 text-[15px] font-semibold text-[#464543]">
+            <p className="mb-3 text-[15px] font-semibold text-[#4a4a4a]">
               If you or someone you know needs help:
             </p>
             <div className="flex flex-col gap-3">
@@ -828,7 +828,7 @@ export default function RoomPage({
               >
                 National Domestic Violence Hotline: 1-800-799-7233
               </a>
-              <p className="text-[14px] text-[#464543]">
+              <p className="text-[14px] text-[#4a4a4a]">
                 Or text <span className="font-semibold">START</span> to <span className="font-semibold">88788</span>
               </p>
               <a
@@ -897,7 +897,7 @@ export default function RoomPage({
           </div>
           <h2
             key={transitionMsgIndex}
-            className="font-display max-w-[280px] text-center text-[22px] font-medium leading-[1.2] tracking-[-0.5px] text-[var(--damson-600)] animate-fade-in"
+            className="font-display max-w-[280px] text-center text-[22px] leading-[1.2] tracking-[-0.5px] text-[var(--damson-600)] animate-fade-in"
           >
             {transitionMessages[transitionMsgIndex]}
           </h2>
@@ -917,7 +917,7 @@ export default function RoomPage({
             <span className="h-2.5 w-2.5 animate-bounce rounded-full bg-[var(--damson-400)] [animation-delay:240ms]" />
           </div>
           <h2
-            className="font-display max-w-[280px] text-center text-[22px] font-medium leading-[1.2] tracking-[-0.5px] text-[var(--damson-600)]"
+            className="font-display max-w-[280px] text-center text-[22px] leading-[1.2] tracking-[-0.5px] text-[var(--damson-600)]"
           >
             Wrapping up your session
           </h2>

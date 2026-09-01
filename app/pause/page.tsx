@@ -268,7 +268,7 @@ export default function Home() {
 
         {/* Body */}
         <div className="mt-10 flex flex-col gap-5 text-center">
-          <p className="font-display text-[20px] font-medium leading-[1.4] tracking-[-0.5px] text-[var(--wood-700)]">
+          <p className="font-display text-[20px] leading-[1.2] tracking-[-0.5px] text-[var(--wood-700)]">
             We&apos;re on pause.
           </p>
           <p className="font-body text-[15px] leading-[1.6] text-[var(--contrast-medium)]">

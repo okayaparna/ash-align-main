@@ -4,11 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 
-import BrushBackground from "@/components/BrushBackground";
 
 type Step = "splash" | "info" | "setup" | "share";
 
-const FONT_STYLE = { fontFamily: '"Libre Baskerville", serif', fontStyle: 'italic' as const };
 
 const CARDS = [
   {
@@ -50,134 +48,137 @@ function BackButton({ onClick }: { onClick: () => void }) {
     <button
       onClick={onClick}
       aria-label="Go back"
-      className="flex h-10 w-10 items-center justify-center rounded-full border border-[#dddad1]"
+      className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f1f0ed]"
     >
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12.5 15L7.5 10L12.5 5" stroke="#1a1918" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M12.5 15L7.5 10L12.5 5" stroke="#282828" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </button>
   );
 }
 
-// --- Screen 1: Splash ---
+// --- Screen 1: Splash (essay layout) ---
+const HERO_BUBBLES = [
+  { who: "Maya", text: "i don't think you actually heard me last night", side: "l" as const, delay: 0 },
+  { who: "Sam", text: "i want to. i just get defensive", side: "r" as const, delay: 0.9 },
+  { who: "Ash", text: "Say more about that?", side: "c" as const, ash: true, delay: 1.8 },
+];
+
+const NOT_THIS = [
+  ["Therapy", "Ash is not a therapist and this is not treatment. If something here opens up more than a conversation can hold, that is a signal to talk to a professional, not to keep typing."],
+  ["A referee", "Ash will not tell you who is right. There is no verdict at the end, because the useful thing was never the verdict."],
+  ["A transcript for later", "What you each say in the private phase stays in the private phase. Ash carries the shape of it into the room, not the words."],
+];
+
 function SplashScreen({ onBegin }: { onBegin: () => void }) {
-  const [showAlign, setShowAlign] = useState(false);
-  const [showWith, setShowWith] = useState(false);
-  const [showAsh, setShowAsh] = useState(false);
-  const [phase, setPhase] = useState<"big" | "small">("big");
   const [consentChecked, setConsentChecked] = useState(false);
-
-  useEffect(() => {
-    const t1 = setTimeout(() => setShowAlign(true), 200);
-    const t2 = setTimeout(() => setShowWith(true), 700);
-    const t3 = setTimeout(() => setShowAsh(true), 1200);
-    const t4 = setTimeout(() => setPhase("small"), 2800);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
-  }, []);
-
-  const wordTransition = "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)";
+  const gateRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[var(--surface-bg)]">
-      <BrushBackground variant="alignment" />
+    <div className="min-h-[100dvh] bg-[var(--surface-bg)]">
+      <div className="mx-auto max-w-[610px] px-6">
+        {/* Hero */}
+        <header className="pt-[72px] text-center">
+          <p className="font-display mb-9 text-[15px] italic text-[var(--contrast-weak)]">
+            Align with Ash
+          </p>
 
-      <div
-        className="z-10 flex flex-col items-center"
-        style={{
-          transition: "transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
-          transform: phase === "small" ? "translateY(-20px)" : "translateY(0)",
-        }}
-      >
-        <div
-          className="relative flex items-baseline justify-center"
-          style={{
-            transition: "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
-            gap: phase === "big" ? "0px" : "clamp(8px, 2vw, 14px)",
-          }}
-        >
-          <span
-            className="text-[var(--wood-700)]"
-            style={{
-              ...FONT_STYLE,
-              transition: wordTransition,
-              fontSize: phase === "big" ? "clamp(72px, 18vw, 160px)" : "clamp(48px, 10vw, 72px)",
-              lineHeight: 1,
-              letterSpacing: phase === "big" ? "-5px" : "-3px",
-              transform: phase === "big" ? "translateX(clamp(-30px, -5vw, -60px)) translateY(clamp(-25px, -5vw, -50px))" : "translateX(0) translateY(0)",
-              opacity: showAlign ? 1 : 0,
-            }}
+          <div className="relative mx-auto mb-6 h-[132px] max-w-[520px]">
+            {HERO_BUBBLES.map((b, i) => (
+              <div
+                key={b.who}
+                className={`splash-bub splash-bub-${b.side}`}
+                style={{ top: `${i * 46}px`, animationDelay: `${b.delay}s` }}
+              >
+                <span className={`splash-av${b.ash ? " ash" : ""}`}>{b.who[0]}</span>
+                <span className={`splash-msg${b.ash ? " ash" : ""}`}>{b.text}</span>
+              </div>
+            ))}
+          </div>
+
+          <h1 className="font-display text-[clamp(34px,7vw,54px)] leading-[1.06] text-[var(--contrast-strong)]">
+            A mediated space for couples
+          </h1>
+          <p className="mx-auto mt-6 max-w-[430px] text-[16px] leading-[1.5] text-[var(--contrast-weak)]">
+            Two people, one room, and a third voice whose only job is to keep the
+            conversation honest.
+          </p>
+
+          <button
+            onClick={() => gateRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
+            className="ui-pill mt-8"
           >
-            Align
-          </span>
-          <span
-            className="text-[var(--wood-700)]"
-            style={{
-              ...FONT_STYLE,
-              transition: wordTransition,
-              fontSize: phase === "big" ? "clamp(36px, 9vw, 80px)" : "clamp(28px, 6vw, 40px)",
-              lineHeight: 1,
-              letterSpacing: "-2px",
-              transform: phase === "big" ? "translateX(0px) translateY(clamp(8px, 2vw, 15px))" : "translateX(0) translateY(0)",
-              opacity: showWith ? 1 : 0,
-            }}
+            Begin a session
+            <span className="ui-arrow">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8h9M8.5 4.5L12 8l-3.5 3.5" stroke="currentColor" strokeWidth="1.4"
+                      strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </button>
+        </header>
+
+        {/* Essay */}
+        <section className="pt-16">
+          <p className="splash-lead mb-5 text-[16px] leading-[1.5] text-[var(--contrast-weak)]">
+            Most hard conversations between two people fail in the same few ways. One
+            person gets louder, the other goes quiet. Something said in the first
+            minute gets relitigated for an hour. Both leave feeling less understood
+            than when they started.
+          </p>
+          <p className="text-[16px] leading-[1.5] text-[var(--contrast-weak)]">
+            The problem is rarely that people lack the words. It is that no one in the
+            room is holding the shape of the conversation, because both people are
+            inside it. Ash sits in that seat: it asks each of you what is actually
+            going on, brings you together, and keeps the exchange moving toward
+            understanding instead of a scoreboard.
+          </p>
+
+          <h2 className="font-display mt-12 mb-4 text-[26px] leading-[1.15] text-[var(--contrast-strong)]">
+            What this is not
+          </h2>
+          {NOT_THIS.map(([title, body]) => (
+            <div key={title} className="mb-5">
+              <p className="ui-subhead mb-1">{title}</p>
+              <p className="text-[16px] leading-[1.5] text-[var(--contrast-weak)]">{body}</p>
+            </div>
+          ))}
+        </section>
+
+        {/* Consent gate + primary action */}
+        <div ref={gateRef} className="border-t border-[var(--hairline)] mt-12 pt-10 pb-24">
+          <p className="mx-auto mb-6 max-w-[420px] text-center text-sm leading-[1.5] text-[var(--contrast-weak)]">
+            A space for the conversation you have been putting off. This is a demo and
+            everything you share here disappears when you&apos;re done.
+          </p>
+          <label className="mx-auto mb-6 flex max-w-[420px] cursor-pointer items-start gap-3 text-left">
+            <input
+              type="checkbox"
+              checked={consentChecked}
+              onChange={(e) => setConsentChecked(e.target.checked)}
+              className="mt-0.5 h-[17px] w-[17px] shrink-0 cursor-pointer rounded-[4px] border-[#4a4a4a] accent-[var(--contrast-strong)]"
+            />
+            <span className="font-body text-[12px] font-normal leading-[1.5] text-[var(--contrast-weak)]">
+              I am 18 or older, and I agree to the{" "}
+              <a
+                href="/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold underline text-[var(--contrast-strong)]"
+                onClick={(e) => e.stopPropagation()}
+              >
+                Terms of Use
+              </a>
+            </span>
+          </label>
+          <button
+            onClick={onBegin}
+            disabled={!consentChecked}
+            className="flex h-[64px] w-full items-center justify-center rounded-[var(--radius-pill)] bg-[var(--contrast-strong)] transition-opacity hover:opacity-85 font-body text-[17px] font-medium leading-[1.2] tracking-[-0.011em] text-[var(--surface-bg)] disabled:opacity-40"
           >
-            with
-          </span>
-          <span
-            className="text-[var(--wood-700)]"
-            style={{
-              ...FONT_STYLE,
-              transition: wordTransition,
-              fontSize: phase === "big" ? "clamp(64px, 16vw, 140px)" : "clamp(48px, 10vw, 72px)",
-              lineHeight: 1,
-              letterSpacing: phase === "big" ? "-4px" : "-3px",
-              transform: phase === "big" ? "translateX(clamp(30px, 5vw, 60px)) translateY(clamp(40px, 8vw, 80px))" : "translateX(0) translateY(0)",
-              opacity: showAsh ? 1 : 0,
-            }}
-          >
-            Ash
-          </span>
+            Begin
+          </button>
         </div>
-      </div>
-
-      <div
-        className="z-10 mx-auto mt-8 flex w-full max-w-[465px] flex-col items-center gap-8 px-6 text-center"
-        style={{
-          transition: "opacity 0.8s ease-in-out 0.4s",
-          opacity: phase === "small" ? 1 : 0,
-          pointerEvents: phase === "small" ? "auto" : "none",
-        }}
-      >
-        <p className="max-w-[320px] text-sm leading-[1.5] text-[var(--contrast-weak)]">
-          A space for the conversation you have been putting off. This is a demo and everything you share here disappears when you&apos;re done.
-        </p>
-        <label className="flex cursor-pointer items-start gap-3 text-left">
-          <input
-            type="checkbox"
-            checked={consentChecked}
-            onChange={(e) => setConsentChecked(e.target.checked)}
-            className="mt-0.5 h-[17px] w-[17px] shrink-0 cursor-pointer rounded-[4px] border-[#464543] accent-[#8e521f]"
-          />
-          <span className="font-body text-[12px] font-normal leading-[1.5] text-[var(--contrast-weak)]">
-            I am 18 or older, and I agree to the{" "}
-            <a
-              href="/terms"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-bold underline text-[var(--contrast-strong)]"
-              onClick={(e) => e.stopPropagation()}
-            >
-              Terms of Use
-            </a>
-          </span>
-        </label>
-        <button
-          onClick={onBegin}
-          disabled={!consentChecked}
-          className="flex h-[64px] w-full items-center justify-center rounded-[16px] bg-[#8e521f] font-body text-[18px] font-medium leading-[1.2] tracking-[-0.25px] text-[#f1d5be] disabled:opacity-40"
-        >
-          Begin
-        </button>
       </div>
     </div>
   );
@@ -204,10 +205,10 @@ function InfoScreen({ onBack, onContinue }: { onBack: () => void; onContinue: ()
       </div>
 
       <div className="animate-fade-in flex flex-col gap-4 px-6 pt-8 text-center lg:mx-auto lg:max-w-[600px]">
-        <h1 className="font-display text-[32px] font-medium leading-[1.4] tracking-[-1px] text-[#8e521f]">
+        <h1 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
           How this works
         </h1>
-        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#464543]">
+        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#4a4a4a]">
           Three parts, about thirty minutes. You can stop at any point.
         </p>
       </div>
@@ -244,7 +245,7 @@ function InfoScreen({ onBack, onContinue }: { onBack: () => void; onContinue: ()
               >
                 {card.label}
               </span>
-              <h2 className="font-display text-[24px] font-medium leading-[1.3] tracking-[-0.5px] text-[var(--contrast-strong)]">
+              <h2 className="font-display text-[24px] leading-[1.18] tracking-[-0.5px] text-[var(--contrast-strong)]">
                 {card.title}
               </h2>
               <p className="font-body text-[14px] leading-[1.6] text-[var(--contrast-medium)]">
@@ -267,7 +268,7 @@ function InfoScreen({ onBack, onContinue }: { onBack: () => void; onContinue: ()
       <div className="mx-auto mb-10 mt-10 w-full max-w-[465px] px-6">
         <button
           onClick={onContinue}
-          className="flex h-[64px] w-full items-center justify-center rounded-[16px] bg-[#8e521f] font-body text-[18px] font-medium leading-[1.2] tracking-[-0.25px] text-[#f1d5be]"
+          className="flex h-[64px] w-full items-center justify-center rounded-[var(--radius-pill)] bg-[var(--contrast-strong)] transition-opacity hover:opacity-85 font-body text-[17px] font-medium leading-[1.2] tracking-[-0.011em] text-[var(--surface-bg)]"
         >
           Continue
         </button>
@@ -301,16 +302,16 @@ function SetupScreen({
       </div>
 
       <div className="animate-fade-in flex flex-col gap-4 px-6 pt-8 text-center lg:mx-auto lg:max-w-[600px]">
-        <h1 className="font-display text-[32px] font-medium leading-[1.4] tracking-[-1px] text-[#8e521f]">
+        <h1 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
           To begin with,
         </h1>
-        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#464543]">
+        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#4a4a4a]">
           What should Ash call you during the session?
         </p>
       </div>
 
       <div className="relative z-10 mx-auto mt-16 flex w-full max-w-[465px] flex-col gap-3 px-6">
-        <label className="font-body text-[12px] font-medium uppercase leading-[1.2] tracking-[1.25px] text-[#807e7a]">
+        <label className="font-body text-[12px] font-medium uppercase leading-[1.2] tracking-[1.25px] text-[#6b6b6b]">
           Your name
         </label>
         <input
@@ -319,7 +320,7 @@ function SetupScreen({
           onKeyDown={(e) => {
             if (e.key === "Enter" && canContinue) onContinue();
           }}
-          className="h-[64px] rounded-[16px] bg-[#dddad1] px-[24px] font-body text-[16px] text-[#1a1918] outline-none"
+          className="h-[64px] rounded-[16px] bg-[#f1f0ed] px-[24px] font-body text-[16px] text-[#282828] outline-none"
           placeholder="Enter your name"
           autoFocus
         />
@@ -329,7 +330,7 @@ function SetupScreen({
         <button
           onClick={onContinue}
           disabled={!canContinue}
-          className="flex h-[64px] w-full items-center justify-center rounded-[16px] bg-[#8e521f] font-body text-[18px] font-medium leading-[1.2] tracking-[-0.25px] text-[#f1d5be] disabled:opacity-40"
+          className="flex h-[64px] w-full items-center justify-center rounded-[var(--radius-pill)] bg-[var(--contrast-strong)] transition-opacity hover:opacity-85 font-body text-[17px] font-medium leading-[1.2] tracking-[-0.011em] text-[var(--surface-bg)] disabled:opacity-40"
         >
           {loading ? "Creating your room..." : "Continue"}
         </button>
@@ -356,20 +357,20 @@ function ShareScreen({
   return (
     <div className="flex min-h-[100dvh] flex-col bg-[var(--surface-bg)]">
       <div className="animate-fade-in flex flex-col gap-4 px-6 pt-24 text-center lg:mx-auto lg:max-w-[600px]">
-        <h1 className="font-display text-[32px] font-medium leading-[1.4] tracking-[-1px] text-[#8e521f]">
+        <h1 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
           Your room is ready
         </h1>
-        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#464543]">
+        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#4a4a4a]">
           Send this link to your partner. You will each talk to Ash on your own first, then meet in the middle.
         </p>
       </div>
 
       <div className="mx-auto mt-12 flex w-full max-w-[465px] flex-col gap-3 px-6">
-        <label className="font-body text-[12px] font-medium uppercase leading-[1.2] tracking-[1.25px] text-[#807e7a]">
+        <label className="font-body text-[12px] font-medium uppercase leading-[1.2] tracking-[1.25px] text-[#6b6b6b]">
           Room link
         </label>
-        <div className="flex items-center gap-3 rounded-[16px] bg-[#dddad1] px-[24px] py-[20px]">
-          <p className="min-w-0 flex-1 truncate font-body text-[14px] text-[#464543]">
+        <div className="flex items-center gap-3 rounded-[16px] bg-[#f1f0ed] px-[24px] py-[20px]">
+          <p className="min-w-0 flex-1 truncate font-body text-[14px] text-[#4a4a4a]">
             {roomUrl}
           </p>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -380,13 +381,13 @@ function ShareScreen({
       <div className="mx-auto mt-6 flex w-full max-w-[465px] flex-col items-center gap-4 px-6">
         <button
           onClick={onCopy}
-          className="flex h-[64px] w-full items-center justify-center rounded-[16px] bg-[#8e521f] font-body text-[18px] font-medium leading-[1.2] tracking-[-0.25px] text-[#f1d5be]"
+          className="flex h-[64px] w-full items-center justify-center rounded-[var(--radius-pill)] bg-[var(--contrast-strong)] transition-opacity hover:opacity-85 font-body text-[17px] font-medium leading-[1.2] tracking-[-0.011em] text-[var(--surface-bg)]"
         >
           Copy link
         </button>
         <button
           onClick={onEnter}
-          className="flex h-[64px] w-full items-center justify-center gap-2 rounded-[16px] border border-[#dddad1] font-body text-[18px] font-medium leading-[1.2] tracking-[-0.25px] text-[var(--contrast-strong)]"
+          className="flex h-[64px] w-full items-center justify-center gap-2 rounded-[16px] border border-[#f1f0ed] font-body text-[17px] font-medium leading-[1.2] tracking-[-0.011em] text-[var(--contrast-strong)]"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/icon-door-open.svg" alt="" aria-hidden="true" className="h-5 w-5" />

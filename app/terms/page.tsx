@@ -49,7 +49,7 @@ export default function TermsOfUse() {
           </div>
         </div>
 
-        <h1 className="mb-2 font-display text-[32px] font-medium leading-[1.4] tracking-[-1px] text-[#8e521f]">
+        <h1 className="mb-2 font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
           Terms of Use
         </h1>
         <p className="mb-10 text-sm leading-[1.5] text-[var(--contrast-weak)]">

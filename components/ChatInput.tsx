@@ -44,11 +44,11 @@ export default function ChatInput({ disabled, placeholder, phase, onSend }: Chat
   return (
     <form
       onSubmit={handleSubmit}
-      className="border-t-2 border-[var(--surface-elevated)] bg-[var(--surface-bg)] px-4 pb-6 pt-2 lg:border-t-0 lg:pb-4"
+      className="border-t border-[var(--hairline)] bg-[var(--surface-bg)] px-4 pb-6 pt-3 lg:border-t-0 lg:pb-4"
     >
       <div className="relative mx-auto flex max-w-[600px] items-center gap-3">
         <div
-          className="flex min-h-[56px] flex-1 cursor-text items-end rounded-[var(--radius-pill)] bg-[var(--surface-elevated)] pl-4 pr-2"
+          className="flex min-h-[56px] flex-1 cursor-text items-end rounded-[var(--radius-pill)] border border-[var(--hairline)] bg-[var(--surface-bg)] pl-5 pr-2 transition-colors focus-within:border-[var(--hairline-strong)]"
           onClick={() => textareaRef.current?.focus()}
         >
           <textarea
@@ -68,7 +68,7 @@ export default function ChatInput({ disabled, placeholder, phase, onSend }: Chat
           <button
             type="submit"
             disabled={disabled || !value.trim()}
-            className={`mb-2 ml-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white disabled:opacity-40 ${phase === "commons" ? "bg-[var(--damson-600)]" : "bg-[var(--wood-600)]"}`}
+            className="mb-2 ml-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--contrast-strong)] text-[var(--surface-bg)] transition-opacity hover:opacity-85 disabled:opacity-30"
             aria-label="Send message"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

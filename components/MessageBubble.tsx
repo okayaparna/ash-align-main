@@ -52,9 +52,9 @@ export default function MessageBubble({
           {paragraphs.map((para, i) => (
             <div
               key={`${message.id}-${i}`}
-              className="rounded-[var(--radius-md)] bg-[var(--damson-200)] p-4"
+              className="rounded-[var(--radius-md)] border border-[var(--hairline)] bg-[var(--surface-bg)] px-4 py-3.5"
             >
-              <div className="text-base leading-[1.5] text-[var(--damson-800)]">
+              <div className="font-display text-[17px] leading-[1.45] text-[var(--contrast-strong)]">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm, remarkBreaks]}
                   components={mdComponents}
@@ -108,7 +108,7 @@ export default function MessageBubble({
             {message.author_name}
           </p>
         )}
-        <div className="rounded-[var(--radius-lg)] bg-[var(--surface-elevated)] p-4">
+        <div className="rounded-[var(--radius-lg)] bg-[var(--surface-elevated)] px-4 py-3.5">
           <div className="text-base leading-[1.5] text-[var(--contrast-strong)]">
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkBreaks]}
@@ -133,7 +133,7 @@ export default function MessageBubble({
           {message.author_name}
         </p>
       )}
-      <div className="rounded-[var(--radius-md)] bg-[var(--surface-elevated)] p-4">
+      <div className="rounded-[var(--radius-md)] bg-[var(--surface-elevated)] px-4 py-3.5">
         <div className="text-base leading-[1.5] text-[var(--contrast-strong)]">
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkBreaks]}
