@@ -9,6 +9,7 @@ import type { ChatMessage, RoomState } from "@/lib/types";
 
 import Image from "next/image";
 import AshWordmark from "@/components/AshWordmark";
+import InfoScreen from "@/components/InfoScreen";
 import { PixelCurtain, PixelMosaic } from "@/components/PixelLoader";
 import ChatInput from "@/components/ChatInput";
 import FinishedScreen from "@/components/FinishedScreen";
@@ -20,7 +21,7 @@ import { CheckIcon, HourglassIcon, LinkIcon } from "@/components/icons/MaterialI
 import SurveyScreen from "@/components/SurveyScreen";
 import { PRE_SURVEY_ID, PRE_SURVEY_QUESTIONS, PRE_SURVEY_QUESTIONS_B, isSurveyTestVariant } from "@/lib/surveys";
 
-type ViewState = "splash" | "name" | "survey-intro" | "survey" | "joining" | "chat" | "error";
+type ViewState = "splash" | "info" | "name" | "survey-intro" | "survey" | "joining" | "chat" | "error";
 
 
 /* Joiner's first screen. Same split composition as the creator's landing:
@@ -646,8 +647,21 @@ export default function RoomPage({
     return (
       <>
         {booting ? <PixelCurtain onDone={() => setBooting(false)} /> : null}
-        <SplashScreen onBegin={() => setView("name")} />
+        <SplashScreen onBegin={() => setView("info")} />
       </>
+    );
+  }
+
+  /* The joiner gets the same "how this works" page the creator sees on the
+     landing route — they arrive cold from a link and need it more, since they
+     are about to type something private with no idea what happens to it.
+     Creators skip it: they start at survey-intro, having already read it. */
+  if (view === "info") {
+    return (
+      <InfoScreen
+        onBack={() => setView("splash")}
+        onContinue={() => setView("name")}
+      />
     );
   }
 
@@ -662,7 +676,7 @@ export default function RoomPage({
       <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-[var(--birch)]" style={pageTransition}>
         <div className="px-6 pt-6">
           <button
-            onClick={() => setView("splash")}
+            onClick={() => setView("info")}
             className="flex h-11 w-11 items-center justify-center border border-[var(--hairline)] text-[var(--ink)] transition-colors duration-500 hover:bg-[var(--ink)] hover:text-[var(--birch)]"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" className="icon" aria-hidden="true">
