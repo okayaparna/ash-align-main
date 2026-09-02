@@ -2,7 +2,9 @@
 
 A mediated conversation space for couples. Two participants join a shared room and go through AI-facilitated phases — **Intake** (private 1:1 with Ash), **Commons** (joint conversation), and **Conclusion** (AI-generated summary).
 
-**Live:** https://alignwithash.com/
+**Live:** whatever URL Vercel assigns the project (`*.vercel.app`).
+`alignwithash.com` is company-owned and is *not* this deployment — don't point
+this project at it.
 
 ## Tech Stack
 
