@@ -1,99 +1,532 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-/* Google Sans — local files */
-@font-face {
-  font-family: "Google Sans";
-  src: url("/fonts/google-sans/GoogleSans-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Google Sans";
-  src: url("/fonts/google-sans/GoogleSans-Italic.ttf") format("truetype");
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Google Sans";
-  src: url("/fonts/google-sans/GoogleSans-Medium.ttf") format("truetype");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Google Sans";
-  src: url("/fonts/google-sans/GoogleSans-SemiBold.ttf") format("truetype");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Google Sans";
-  src: url("/fonts/google-sans/GoogleSans-Bold.ttf") format("truetype");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
+@custom-variant dark (&:is(.dark *));
 
-/* PP Fragment Glare — display font */
-@font-face {
-  font-family: "PP Fragment Glare";
-  src: url("/fonts/pp-fragment/PPFragment-GlareMedium.ttf") format("truetype");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
+/* ============================================================
+   Palette + tokens ported from meadowell.com
 
-/* DM Sans — variable font */
-@font-face {
-  font-family: "DM Sans";
-  src: url("/fonts/dm-sans/DMSans-VariableFont_opsz,wght.ttf") format("truetype");
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
+   Source of truth (lifted from the live site's :root):
+     --birch  #edebe4   page ground, every screen
+     --ink    #000000   type, and the "black" button
+     --brand  #ead268   brand yellow, primary CTA fill
+     --green  #d6ebc5   the one supporting accent
+
+   There is no white and no gray ramp on the reference site. Depth comes
+   from black at low alpha over the birch ground, which is why the muted /
+   border / field tokens below are alphas rather than flat hex.
+
+   Corners are square. meadowell renders every button, input and card at
+   border-radius 0; only avatars are round.
+   ============================================================ */
 
 :root {
-  --surface-bg: #ebe7de;
-  --surface-elevated: #dddad1;
-  --surface-high: #a2a09a;
+  /* --- Brand primitives --- */
+  --birch: #edebe4;
+  /* Document stock. The main sheet is a notepad yellow, mixed down from the
+     brand yellow so it stays in the palette; the second sheet is a cooler
+     stock so the two read as different pieces of paper where they overlap.
+     --paper-edge tones are for the leaves stacked underneath. The top sheet is
+     the lightest of the set, as in a real stack, and every one of them is well
+     clear of the birch ground — an earlier pass had the second sheet at #efeee4
+     against a #edebe4 page, and the edge simply vanished. */
+  --paper: #ece1a8;
+  --paper-2: #f7f1c8;
+  --paper-edge: #e2d69a;
+  --paper-edge-2: #d6c988;
+  /* birch under the steps layer's 10% black — what shows through a punch hole */
+  --paper-hole: #d5d3cd;
+  --ink: #000000;
+  --brand: #ead268;
+  --green: #d6ebc5;
 
-  --contrast-strong: #1a1918;
-  --contrast-medium: #464543;
-  --contrast-weak: #807e7a;
-  --contrast-subtle: #63615d;
+  --radius: 0rem;
 
-  --wood-50: #f8f2ef;
-  --wood-200: #e9d7cb;
-  --wood-500: #ad7049;
-  --wood-600: #855639;
-  --wood-700: #5f3e28;
-  --wood-800: #352317;
+  /* --- shadcn semantic layer, mapped onto the brand primitives --- */
+  --background: var(--birch);
+  --foreground: var(--ink);
+  --card: var(--birch);
+  --card-foreground: var(--ink);
+  --popover: var(--birch);
+  --popover-foreground: var(--ink);
 
-  --olive-50: #f3f5e9;
-  --olive-200: #d9ddb6;
-  --olive-600: #5f652f;
-  --olive-700: #444822;
+  /* Primary is the yellow CTA: yellow fill, black label. */
+  --primary: var(--brand);
+  --primary-foreground: var(--ink);
+  /* Secondary is the inverse black button. */
+  --secondary: var(--ink);
+  --secondary-foreground: var(--birch);
 
-  --damson-200: #d1ddd7;
-  --damson-500: #648675;
-  --damson-600: #4d675a;
-  --damson-700: #374940;
-  --damson-800: #1f2924;
+  /* Fields and quiet surfaces are black at 5%, exactly as on the reference. */
+  --muted: rgba(0, 0, 0, 0.05);
+  --muted-foreground: rgba(0, 0, 0, 0.6);
+  --accent: var(--green);
+  --accent-foreground: var(--ink);
+  --destructive: #a5321f;
+  --border: rgba(0, 0, 0, 0.14);
+  --input: rgba(0, 0, 0, 0.14);
+  --ring: rgba(0, 0, 0, 0.35);
 
-  --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-pill: 32px;
+  --chart-1: var(--brand);
+  --chart-2: var(--green);
+  --chart-3: rgba(0, 0, 0, 0.7);
+  --chart-4: rgba(0, 0, 0, 0.45);
+  --chart-5: rgba(0, 0, 0, 0.2);
+
+  --sidebar: var(--birch);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--ink);
+  --sidebar-primary-foreground: var(--birch);
+  --sidebar-accent: rgba(0, 0, 0, 0.05);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: rgba(0, 0, 0, 0.14);
+  --sidebar-ring: rgba(0, 0, 0, 0.35);
+
+  /* --- Type scale (from the reference site's computed styles) --- */
+  /* Body is 16/1.3. Section titles are 56px at line-height 1.0.
+     Eyebrows are 11px uppercase at 0.1em. Buttons are 14px at 0.02em. */
+  --text-body: 16px;
+  --text-body-leading: 1.3;
+  --text-title: clamp(34px, 4.6vw, 56px);
+  --text-eyebrow: 11px;
+  --text-button: 14px;
+
+  /* Chat surface. Type scale drives every piece of chat text at once. */
+  --bubble: rgba(0, 0, 0, 0.055);
+  --msg-size: 16px;
+  --msg-leading: 22px;
+  --ui-size: 14px;
+  --ui-leading: 20px;
+
+  /* Participant identity + controls. The two people are told apart with the
+     reference site's only two accents: brand yellow and green. */
+  --chip-self: var(--brand);
+  --chip-partner: var(--green);
+  --chip-foreground: var(--ink);
+  --switch-track: rgba(0, 0, 0, 0.09);
+  --switch-thumb: var(--birch);
+  --switch-inactive: rgba(0, 0, 0, 0.45);
+  --action: var(--ink);
+  --action-foreground: var(--birch);
+  --action-disabled: rgba(0, 0, 0, 0.08);
+  --action-disabled-foreground: rgba(0, 0, 0, 0.3);
+
+  /* Motion. The reference site's buttons cross-fade over a full second on a
+     heavy ease-out; its sliding UI uses the shorter curve. */
+  --ease-slow: 1s cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-ui: 280ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Inverted section treatment: the reference site's dark bands are flat black
+   with birch text, not a separate gray ramp. */
+.dark {
+  --background: var(--ink);
+  --foreground: var(--birch);
+  --card: var(--ink);
+  --card-foreground: var(--birch);
+  --popover: var(--ink);
+  --popover-foreground: var(--birch);
+  --primary: var(--brand);
+  --primary-foreground: var(--ink);
+  --secondary: var(--birch);
+  --secondary-foreground: var(--ink);
+  --muted: rgba(237, 235, 228, 0.08);
+  --muted-foreground: rgba(237, 235, 228, 0.6);
+  --accent: var(--green);
+  --accent-foreground: var(--ink);
+  --destructive: #e07a63;
+  --border: rgba(237, 235, 228, 0.18);
+  --input: rgba(237, 235, 228, 0.18);
+  --ring: rgba(237, 235, 228, 0.4);
+
+  --sidebar: var(--ink);
+  --sidebar-foreground: var(--birch);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: var(--ink);
+  --sidebar-accent: rgba(237, 235, 228, 0.08);
+  --sidebar-accent-foreground: var(--birch);
+  --sidebar-border: rgba(237, 235, 228, 0.18);
+  --sidebar-ring: rgba(237, 235, 228, 0.4);
+
+  --bubble: rgba(237, 235, 228, 0.1);
+  --switch-thumb: var(--ink);
+  --switch-track: rgba(237, 235, 228, 0.16);
+  --action: var(--birch);
+  --action-foreground: var(--ink);
+}
+
+@theme inline {
+  /* Season is scoped to headings only (see app/layout.tsx). The default sans
+     — and therefore the whole chat surface — is the UI face. */
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-src), ui-sans-serif, system-ui, sans-serif;
+  --font-kicker: var(--font-kicker-src), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-body-src), ui-sans-serif, system-ui, sans-serif;
+  --font-ui: var(--font-ui-src), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-src), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-birch: #edebe4;
+  --color-ink: #000000;
+  --color-brand: #ead268;
+  --color-green: #d6ebc5;
+
+  /* Square across the board, per the reference. Kept as separate names so the
+     existing rounded-[var(--radius-*)] call sites still resolve. */
+  --radius-sm: var(--radius);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-bubble: var(--bubble);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* These live in @layer components so Tailwind utilities — `hidden`,
+   `lg:inline-flex`, spacing overrides — still win over them. Unlayered
+   rules beat every utility and silently break responsive variants. */
+@layer components {
+  /* ============================================================
+     Chat text UI — geometry from Figma 81-1431 (Material 3 kit).
+     Bump --msg-size / --msg-leading to rescale all chat text at once.
+     ============================================================ */
+
+  /* Chat messages are body copy, not chrome — Season never appears in a bubble. */
+  .msg-text {
+    font-family: var(--font-body-src), ui-sans-serif, system-ui, sans-serif;
+    font-size: var(--msg-size);
+    line-height: var(--msg-leading);
+    letter-spacing: 0;
+  }
+
+  /* Square, like every other surface on the reference site. The tail corner
+     is gone with the radius; the speaker is now told by side + fill. */
+  .msg-bubble {
+    max-width: 72%;
+    width: fit-content;
+    border-radius: 0;
+    background: var(--bubble);
+    color: var(--chip-foreground);
+    padding: 16px 20px;
+    font-size: var(--msg-size);
+    line-height: var(--msg-leading);
+    letter-spacing: 0;
+  }
+
+  /* Your own messages sit on the brand yellow; the partner's on the tint. */
+  .msg-bubble-mine { background: var(--brand); }
+  .msg-bubble-theirs { background: var(--bubble); }
+
+  /* ---------- Header controls ---------- */
+
+  .ui-text {
+    font-family: var(--font-ui-src), ui-sans-serif, system-ui, sans-serif;
+    font-size: var(--ui-size);
+    line-height: var(--ui-leading);
+    letter-spacing: 0;
+  }
+
+  /* Participant chip — colour-coded so the two people are told apart at a glance */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    min-width: 0;
+    max-width: 100%;
+    padding: 0 16px;
+    border-radius: 0;
+    font-family: var(--font-ui-src), ui-sans-serif, system-ui, sans-serif;
+    font-size: var(--ui-size);
+    line-height: var(--ui-leading);
+    font-weight: 500;
+    color: var(--chip-foreground);
+    white-space: nowrap;
+    transition: background-color 160ms ease, color 160ms ease;
+  }
+  .chip > svg { flex: none; }
+  .chip-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* Below lg the chips collapse to overlapping circles carrying the initial,
+     which is what the mobile design shows. */
+  .chip-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border-radius: var(--radius-circle);
+    font-family: var(--font-ui-src), ui-sans-serif, system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--chip-foreground);
+  }
+
+  .chip-self { background: var(--chip-self); }
+  .chip-partner { background: var(--chip-partner); }
+  .chip[data-absent="true"] { opacity: 0.5; }
+
+  /* Phase switcher — segmented control with a sliding thumb */
+  .phase-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    padding: 4px;
+    border-radius: 0;
+    background: var(--switch-track);
+  }
+  .phase-switch-thumb {
+    position: absolute;
+    /* Without an explicit left the box takes its *static* position, which is
+       already inset by the track's 4px padding — the translateX then double-counts
+       it and the thumb overhangs the track on the last segment. */
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    border-radius: 0;
+    background: var(--switch-thumb);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+    /* The reference's easing — slides between segments rather than cutting */
+    transition:
+      transform 280ms cubic-bezier(0.23, 1, 0.32, 1),
+      width 280ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .phase-switch-item {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    min-width: 0;
+    padding: 0 20px;
+    border-radius: 0;
+    font-family: var(--font-ui-src), ui-sans-serif, system-ui, sans-serif;
+    font-size: var(--ui-size);
+    line-height: var(--ui-leading);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--switch-inactive);
+    transition: color 180ms ease;
+  }
+
+  @media (max-width: 767px) {
+    .phase-switch-item {
+      padding: 0 10px;
+      font-size: 13px;
+    }
+  }
+  .phase-switch-item[data-active="true"] {
+    color: var(--chip-foreground);
+    font-weight: 600;
+  }
+  .phase-switch-item:disabled { cursor: default; }
+
+  /* Filled action button (I'm Ready / End Session) */
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 22px;
+    border-radius: 0;
+    background: var(--action);
+    color: var(--action-foreground);
+    font-family: var(--font-ui-src), ui-sans-serif, system-ui, sans-serif;
+    font-size: var(--ui-size);
+    line-height: var(--ui-leading);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    transition: background var(--ease-slow), color var(--ease-slow);
+  }
+  @media (max-width: 767px) {
+    .action-btn {
+      width: 44px;
+      padding: 0;
+    }
+  }
+
+  /* Black -> yellow, the reference site's button hover. */
+  .action-btn:hover:not(:disabled) {
+    background: var(--brand);
+    color: var(--ink);
+  }
+  .action-btn:disabled {
+    background: var(--action-disabled);
+    color: var(--action-disabled-foreground);
+  }
+
+  /* Icon button (copy link) */
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    width: 40px;
+    border-radius: 0;
+    color: var(--switch-inactive);
+    transition: color 160ms ease, background-color 160ms ease;
+  }
+  .icon-btn:hover { color: var(--chip-foreground); background: var(--muted); }
+
+  /* Tooltip — spec lifted from iamnoman.com/shop */
+  .ui-tooltip {
+    pointer-events: none;
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    margin-top: 8px;
+    z-index: 50;
+    border-radius: 0;
+    background: var(--ink);
+    color: var(--birch);
+    padding: 5px 9px;
+    font-family: var(--font-ui-src), ui-sans-serif, system-ui, sans-serif;
+    font-size: 11px;
+    line-height: 14px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.28);
+    opacity: 0;
+    transform: translateX(-50%) scale(0.97) translateY(-2px);
+    transform-origin: center top;
+    transition:
+      opacity 150ms cubic-bezier(0.23, 1, 0.32, 1),
+      transform 150ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .ui-tooltip[data-open="true"] {
+    opacity: 1;
+    transform: translateX(-50%) scale(1) translateY(0);
+  }
+
+  /* Controls that sit against a viewport edge anchor their tooltip to that edge
+     instead of centring it, so it can't be clipped. */
+  .ui-tooltip[data-align="start"] {
+    left: 0;
+    transform: scale(0.97) translateY(-2px);
+    transform-origin: left top;
+  }
+  .ui-tooltip[data-align="start"][data-open="true"] {
+    transform: scale(1) translateY(0);
+  }
+  .ui-tooltip[data-align="end"] {
+    left: auto;
+    right: 0;
+    transform: scale(0.97) translateY(-2px);
+    transform-origin: right top;
+  }
+  .ui-tooltip[data-align="end"][data-open="true"] {
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ============================================================
+   Ash Align — legacy token aliases
+   Every one of these now resolves onto the meadowell palette above, so the
+   ~200 existing call sites keep working while the app reads as birch/black
+   with yellow and green as the only accents.
+   ============================================================ */
+
+:root {
+  /* Ground + ink */
+  --surface-bg: var(--birch);
+  --surface-elevated: rgba(0, 0, 0, 0.05);
+  --surface-high: rgba(0, 0, 0, 0.09);
+  --hairline: rgba(0, 0, 0, 0.14);
+  --hairline-strong: rgba(0, 0, 0, 0.3);
+
+  --contrast-strong: var(--ink);
+  --contrast-medium: rgba(0, 0, 0, 0.72);
+  --contrast-weak: rgba(0, 0, 0, 0.6);
+  --contrast-subtle: rgba(0, 0, 0, 0.4);
+  --ink-soft: rgba(0, 0, 0, 0.6);
+
+  /* Former phase accents. wood -> black ramp, olive -> green, damson -> brand
+     yellow, so anything still calling them lands inside the reference palette. */
+  --wood-50: var(--birch);
+  --wood-200: rgba(0, 0, 0, 0.09);
+  --wood-300: rgba(0, 0, 0, 0.16);
+  --wood-500: rgba(0, 0, 0, 0.55);
+  --wood-600: rgba(0, 0, 0, 0.75);
+  --wood-700: var(--ink);
+  --wood-800: var(--ink);
+
+  --olive-50: color-mix(in srgb, var(--green) 40%, var(--birch));
+  --olive-200: var(--green);
+  --olive-600: rgba(0, 0, 0, 0.72);
+  --olive-700: var(--ink);
+
+  --damson-200: color-mix(in srgb, var(--brand) 45%, var(--birch));
+  --damson-300: color-mix(in srgb, var(--brand) 70%, var(--birch));
+  --damson-400: var(--brand);
+  --damson-500: var(--brand);
+  --damson-600: rgba(0, 0, 0, 0.72);
+  --damson-700: var(--ink);
+  --damson-800: var(--ink);
+
+  /* Square, like everything else on the reference site. Kept as a name so the
+     `rounded-[var(--radius-pill)]` call sites resolve without edits. */
+  --radius-pill: 0px;
+  /* Genuinely circular things (avatars) opt in explicitly. */
+  --radius-circle: 999px;
 }
 
 body {
   margin: 0;
-  background: var(--surface-bg);
-  color: var(--contrast-strong);
-  font-family: "Google Sans", sans-serif;
+  /* Body copy is Archivo at 16/1.3. Season is reserved for headings, and the
+     tighter UI face is reserved for controls — reading text gets its own. */
+  font-family: var(--font-body-src), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--text-body);
+  line-height: var(--text-body-leading);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -102,9 +535,396 @@ button {
   cursor: pointer;
 }
 
-.font-display {
-  font-family: "Libre Baskerville", "PP Fragment Glare", serif;
+/* Everything below is in @layer components on purpose: unlayered CSS beats
+   every Tailwind utility, so a `.button` with `mt-7` or a `.section-title`
+   with `text-[32px]` would silently lose. Keep new component classes here. */
+@layer components {
+  /* ============================================================
+     Type roles, straight off meadowell.com
+     ============================================================ */
+
+  /* Season Mix — HEADINGS ONLY. Weight 400 is the reference's --font-primary
+     (SeasonMix Regular). Line-height 1 at display sizes is its signature:
+     section titles set solid. Do not reach for this on body or chat text. */
+  .font-display {
+    font-family: var(--font-display-src), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  /* Body copy helper — same face as `body`. */
+  .font-body {
+    font-family: var(--font-body-src), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* UI chrome: Inter. Buttons, fields, chips, switcher, tooltips. */
+  .font-ui {
+    font-family: var(--font-ui-src), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* 56px at line-height 1.0, clamped down for small screens. */
+  .section-title {
+    font-family: var(--font-display-src), ui-sans-serif, system-ui, sans-serif;
+    font-size: var(--text-title);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.015em;
+  }
+
+  /* The reference's `.small-text`: 11px uppercase at 0.1em in SeasonSans
+     SemiBold. These kickers sit above headings, so they are the one non-heading
+     role that keeps a Season face. */
+  .eyebrow,
+  .small-text {
+    font-family: var(--font-kicker-src), ui-sans-serif, system-ui, sans-serif;
+    font-size: var(--text-eyebrow);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    line-height: 1.6;
+    text-transform: uppercase;
+  }
+
+  /* Sub-headers */
+  .ui-subhead {
+    font-family: var(--font-display-src), ui-sans-serif, system-ui, sans-serif;
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--contrast-strong);
+  }
+
+  /* ============================================================
+     Buttons — exact geometry from the reference site's `.button`:
+     14px / line-height 1 / 0.02em (on Inter 600 here), 1.15rem 1.6rem padding,
+     square, and a full-second cross-fade that inverts the fill on hover.
+     ============================================================ */
+
+  .button,
+  .ui-pill,
+  .ui-pill-solid {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1px solid transparent;
+    border-radius: 0;
+    background: var(--brand);
+    color: var(--ink);
+    font-family: var(--font-ui-src), ui-sans-serif, system-ui, sans-serif;
+    font-size: var(--text-button);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    padding: 1.15rem 1.6rem;
+    width: max-content;
+    transition: background var(--ease-slow), color var(--ease-slow),
+      border-color var(--ease-slow);
+  }
+
+  /* Yellow -> black on hover, which is what the reference does. */
+  .button:hover:not(:disabled),
+  .ui-pill-solid:hover:not(:disabled) {
+    background: var(--ink);
+    color: var(--birch);
+  }
+
+  /* Inverse variant: black fill, yellow on hover. */
+  .button--black {
+    background: var(--ink);
+    color: var(--birch);
+  }
+  .button--black:hover:not(:disabled) {
+    background: var(--brand);
+    color: var(--ink);
+  }
+
+  /* Outlined variant. `.ui-pill` is the app's existing name for it. */
+  .button--basic,
+  .ui-pill {
+    background: transparent;
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+  .button--basic:hover:not(:disabled),
+  .ui-pill:hover:not(:disabled) {
+    background: var(--ink);
+    color: var(--birch);
+  }
+
+  .button:disabled,
+  .ui-pill:disabled,
+  .ui-pill-solid:disabled {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  /* Full-width block CTA — same skin, stretched. */
+  .button--block {
+    width: 100%;
+    padding: 1.35rem 1.6rem;
+  }
+
+  /* Inline arrow that follows a label. The reference draws it as a plain
+     13px glyph beside `.small-text`, not a filled badge. */
+  .ui-arrow {
+    display: inline-grid;
+    place-items: center;
+    width: 13px;
+    height: 13px;
+    flex: none;
+    color: currentColor;
+    background: transparent;
+    transition: transform var(--ease-ui);
+  }
+  .button:hover .ui-arrow,
+  .ui-pill:hover .ui-arrow,
+  .ui-pill-solid:hover .ui-arrow {
+    transform: translateX(3px);
+  }
+
+  /* ============================================================
+     Fields — the reference site's input skin: black-at-5% fill, no border,
+     square, 1rem padding, 0.02em tracking on the UI face.
+     ============================================================ */
+
+  .field {
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--ink);
+    font-family: var(--font-ui-src), ui-sans-serif, system-ui, sans-serif;
+    font-size: var(--text-body);
+    letter-spacing: 0.02em;
+    padding: 1rem;
+    outline: none;
+    transition: background 200ms ease, box-shadow 200ms ease;
+  }
+  .field::placeholder { color: rgba(0, 0, 0, 0.4); }
+  .field:focus {
+    background: rgba(0, 0, 0, 0.07);
+    box-shadow: inset 0 -1px 0 0 var(--ink);
+  }
+
+  /* ============================================================
+     Icons — the reference uses 24-unit stroke icons: currentColor,
+     stroke-width 1.8, round caps and joins, no fill. Anything drawn inline
+     should carry `.icon`; lucide-react already matches this spec.
+     ============================================================ */
+
+  .icon {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ============================================================
+     Pixel-mosaic loader. Tiles pop, they never fade — the animation runs on
+     steps(), so every tile is either fully there or fully gone and the grid
+     edge stays crisp. Random per-tile delays do the dissolving.
+     ============================================================ */
+
+  /* auto-fill sizes the grid to the viewport with no measuring and no resize
+     listener; the component renders a surplus of tiles and overflow clips the
+     ones that fall off the bottom. */
+  .pixel-curtain {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    grid-auto-rows: 64px;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  @media (min-width: 1600px) {
+    .pixel-curtain {
+      grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+      grid-auto-rows: 88px;
+    }
+  }
+
+  /* The wordmark card that opens the curtain, cleared just before the tiles. */
+  .pixel-curtain-mark {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    animation: pixel-mark-out 240ms ease-out forwards;
+  }
+
+  @keyframes pixel-mark-out {
+    to { opacity: 0; }
+  }
+
+  /* Typed heading caret. */
+  .type-caret {
+    display: inline-block;
+    width: 0.055em;
+    height: 0.82em;
+    margin-left: 0.07em;
+    vertical-align: -0.06em;
+    background: currentColor;
+    animation: caret-blink 900ms steps(1, end) infinite;
+  }
+
+  @keyframes caret-blink {
+    0%, 50% { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+  }
+
+  .pixel-mosaic {
+    display: grid;
+    gap: 3px;
+    width: 84px;
+    height: 84px;
+  }
+
+  .pixel-tile {
+    display: block;
+    background: var(--brand);
+  }
+
+  .pixel-tile--out {
+    animation: pixel-out 190ms steps(1, end) forwards;
+  }
+
+  .pixel-tile--flicker {
+    animation: pixel-flicker 1500ms steps(1, end) infinite;
+  }
+
+  @keyframes pixel-out {
+    to { opacity: 0; }
+  }
+
+  @keyframes pixel-flicker {
+    0%, 45% { opacity: 1; }
+    50%, 95% { opacity: 0.16; }
+    100% { opacity: 1; }
+  }
+
+  /* Motion-sensitive users get the colour, not the strobe. */
+  @media (prefers-reduced-motion: reduce) {
+    .pixel-tile--out {
+      animation: pixel-out 160ms linear forwards;
+      animation-delay: 0ms !important;
+    }
+    .pixel-tile--flicker {
+      animation: none;
+      opacity: 0.5;
+    }
+  }
+
+  /* Hairline rule, the reference's only divider treatment. */
+  .rule {
+    border: 0;
+    border-top: 1px solid var(--hairline);
+  }
+
+  /* ============================================================
+     Film grain. A tiled fractal-noise SVG laid over photography so the
+     imagery sits on the same slightly-analogue surface as the paper.
+     Put `.grain` on a positioned ancestor; it paints through ::after.
+     ============================================================ */
+
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.22;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+  }
+
+  /* Softer pass for paper, which should read as stock rather than film. */
+  .grain--paper::after {
+    opacity: 0.5;
+    mix-blend-mode: multiply;
+  }
+
+  /* ============================================================
+     The document sheet. Modelled on the reference site's letterhead:
+     tinted stock, a meta block of monospace rules across the head, a
+     punch hole in the left margin, and typewriter body copy.
+     ============================================================ */
+
+  .sheet {
+    background: var(--paper);
+    color: var(--ink);
+    /* Belt and braces with the drop shadow: the edge stays readable even where
+       a sheet overlaps another sheet rather than the page. */
+    outline: 1px solid rgba(0, 0, 0, 0.1);
+    outline-offset: -1px;
+  }
+
+  /* The second leaf, so the overlap reads as two sheets rather than one. */
+  .sheet--alt {
+    background: var(--paper-2);
+  }
+
+  /* Punch holes down the left margin, as on a filed document. */
+  .sheet-holes {
+    position: absolute;
+    left: 22px;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(90px, 22vh, 190px);
+    pointer-events: none;
+  }
+
+  /* Monospace meta rows across the head of the document. */
+  .sheet-meta {
+    font-family: var(--font-mono-src), ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .sheet-rule {
+    border: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.55);
+  }
+
+  /* The punch hole, sitting in the left margin like a filed document. */
+  /* Punched *through* the sheet: the hole shows the ground behind it, which is
+     what sells the sheet as floating above the page rather than printed on it.
+     --paper-hole is the pinned steps layer's composited colour (birch under
+     10% black); the inset shadow is the paper's own cut edge catching light. */
+  .sheet-punch {
+    width: 17px;
+    height: 17px;
+    flex: none;
+    border-radius: var(--radius-circle);
+    background: var(--paper-hole);
+    box-shadow:
+      inset 0 1px 2px rgba(0, 0, 0, 0.28),
+      0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  /* Typewriter body. Kept sentence case — the reference sets its letter in
+     uppercase, which is fine for six lines and punishing for six paragraphs. */
+  .sheet-body {
+    font-family: var(--font-mono-src), ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13.5px;
+    line-height: 1.75;
+    letter-spacing: 0.005em;
+    color: rgba(0, 0, 0, 0.88);
+  }
 }
+
 
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(8px); }

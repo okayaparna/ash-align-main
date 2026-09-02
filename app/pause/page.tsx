@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePostHog } from "posthog-js/react";
 
-const FONT_STYLE = { fontFamily: '"Libre Baskerville", serif', fontStyle: 'italic' as const };
+const FONT_STYLE = { fontFamily: 'var(--font-display-src), ui-sans-serif, system-ui, sans-serif', letterSpacing: '-0.01em' };
 
 const INIT = "INIT";
 const SUBMITTING = "SUBMITTING";
@@ -20,8 +20,8 @@ const formStyles = {
   formFontSizePx: 14,
   buttonText: "Join Waitlist",
   buttonFont: "Inter",
-  buttonFontColor: "#ffffff",
-  buttonColor: "#5f3e28",
+  buttonFontColor: "#edebe4",
+  buttonColor: "#000000",
   buttonFontSizePx: 14,
   successMessage: "Thanks! We'll be in touch!",
   successFont: "Inter",
@@ -144,7 +144,7 @@ function LoopsSignUpForm() {
         </div>
         <button
           style={{
-            color: "#6b7280",
+            color: "var(--contrast-weak)",
             font: "14px, Inter, sans-serif",
             margin: "10px auto",
             textAlign: "center",
@@ -187,7 +187,7 @@ function LoopsSignUpForm() {
           maxWidth: "300px",
           minWidth: "100px",
           background: "#FFFFFF",
-          border: "1px solid #D1D5DB",
+          border: "1px solid #e5e5e5",
           boxSizing: "border-box" as const,
           boxShadow: "rgba(0, 0, 0, 0.05) 0px 1px 2px",
           borderRadius: "6px",
@@ -227,7 +227,7 @@ function LoopsSignUpForm() {
 
 export default function Home() {
   return (
-    <div className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[var(--surface-bg)]">
+    <div className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[var(--birch)]">
       <div className="z-10 mx-auto flex w-full max-w-[520px] flex-col items-center px-6">
         {/* Title */}
         <div className="flex items-baseline justify-center" style={{ gap: "clamp(8px, 2vw, 14px)" }}>
@@ -268,7 +268,7 @@ export default function Home() {
 
         {/* Body */}
         <div className="mt-10 flex flex-col gap-5 text-center">
-          <p className="font-display text-[20px] font-medium leading-[1.4] tracking-[-0.5px] text-[var(--wood-700)]">
+          <p className="font-display text-[20px] leading-[1.2] tracking-[-0.5px] text-[var(--wood-700)]">
             We&apos;re on pause.
           </p>
           <p className="font-body text-[15px] leading-[1.6] text-[var(--contrast-medium)]">

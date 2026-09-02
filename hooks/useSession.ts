@@ -32,12 +32,15 @@ interface JoinResponse {
 interface PollResponse {
   state: RoomState;
   messages: ChatMessage[];
+  /** The participant's own intake transcript — stays readable in commons */
+  intakeMessages: ChatMessage[];
 }
 
 export function useSession(roomId: string) {
   const [participantId, setParticipantId] = useState<string | null>(null);
   const [state, setState] = useState<SessionState>("idle");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [intakeMessages, setIntakeMessages] = useState<ChatMessage[]>([]);
   const [typing, setTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [roomState, setRoomState] = useState<RoomState | null>(null);
@@ -56,6 +59,7 @@ export function useSession(roomId: string) {
         const result = await api<PollResponse>(`/api/room/poll?participantId=${encodeURIComponent(participantId)}`);
         if (cancelled) return;
         setRoomState(result.state);
+        setIntakeMessages(result.intakeMessages ?? []);
         // Don't overwrite messages while a send is in-flight — send() handles its own update
         if (!pendingRef.current) {
           setMessages(result.messages);
@@ -228,5 +232,5 @@ export function useSession(roomId: string) {
     }
   }, [participantId]);
 
-  return { state, roomState, messages, typing, error, canSend, readyLoading, wrapUpLoading, handRaiseLoading, join, send, ready, wrapUp, raiseHand, endSession };
+  return { state, roomState, messages, intakeMessages, typing, error, canSend, readyLoading, wrapUpLoading, handRaiseLoading, join, send, ready, wrapUp, raiseHand, endSession };
 }

@@ -121,7 +121,7 @@ export default function BrushBackground({
 
           p.randomSeed(42);
           p.noiseSeed(42);
-          p.background("#ebe7de");
+          p.background("#fcfcfc");
 
           const noiseScale = 0.004;
           const segmentLen = 2.5;
@@ -355,7 +355,7 @@ export default function BrushBackground({
 
           p.randomSeed(42);
           p.noiseSeed(42);
-          p.background("#ebe7de");
+          p.background("#fcfcfc");
 
           const noiseScale = 0.005;
           const segmentLength = 3;
