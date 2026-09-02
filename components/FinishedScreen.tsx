@@ -166,7 +166,7 @@ export default function FinishedScreen({
 
         {/* Demo reminder */}
         <p className="mt-4 max-w-[360px] text-center text-sm leading-[1.5] text-[var(--contrast-weak)]">
-          Reminder, this is a demo and everything you shared here will be deleted within 24 hours. No accounts, no cookies.
+          Reminder, this is a demo and everything you shared here will be deleted within 48 hours. No accounts, no cookies.
         </p>
 
         {/* Combined summary + insight + recommendations */}

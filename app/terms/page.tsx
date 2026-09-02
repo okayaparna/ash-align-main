@@ -83,7 +83,7 @@ export default function TermsOfUse() {
               <strong>What we do NOT do:</strong> We do not create accounts for you. We do not use cookies for tracking. We do not sell, share, or distribute your conversation data to third parties. We do not use your conversation content to train AI models.
             </p>
             <p className="mb-3">
-              <strong>When your session ends:</strong> All conversation data is permanently deleted within 24 hours of your session ending. We do not retain transcripts, summaries, or any record of what was discussed.
+              <strong>When your session ends:</strong> All conversation data is permanently deleted within 48 hours of your session ending. We do not retain transcripts, summaries, or any record of what was discussed.
             </p>
             <p>
               <strong>Third-party services:</strong> Ash Align uses third-party AI services to power the conversation facilitator. Your conversation text is sent to these services for real-time processing only and is not retained by them beyond the immediate interaction, in accordance with their data processing agreements. We may use analytics services to understand how the product is used in aggregate. These analytics do not include conversation content.

@@ -6,7 +6,12 @@ A mediated conversation space for couples. Two participants join a shared room a
 
 Built with Next.js 16, TypeScript, Tailwind CSS 4, Supabase (Postgres), and the Anthropic SDK.
 
-Live URL: https://alignwithash.com/
+Live URL: whatever Vercel assigns the project (`*.vercel.app`). Note that
+`alignwithash.com` is company-owned and is not this deployment.
+
+Nothing in the code hardcodes a host: share links are built from
+`window.location.origin` at runtime, so an invite link always points at
+whichever origin served the page.
 
 ## Critical Constraints
 
