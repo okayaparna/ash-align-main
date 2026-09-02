@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import AshWordmark from "@/components/AshWordmark";
+import AshSignature from "@/components/AshSignature";
 import { PixelCurtain } from "@/components/PixelLoader";
 import { usePostHog } from "posthog-js/react";
 
@@ -393,6 +394,13 @@ function InfoScreen({ onBack, onContinue }: { onBack: () => void; onContinue: ()
                   going on, brings you together, and keeps the exchange moving toward
                   understanding instead of a scoreboard.
                 </p>
+              </div>
+
+              {/* Signed off, like the letter this sheet is dressed as. Sits
+                  outside the 620px measure so it lands in the right margin
+                  rather than tucking under the last line. */}
+              <div className="mt-12 flex justify-end pr-2 sm:pr-10 lg:pr-16">
+                <AshSignature className="h-[clamp(54px,5.5vw,82px)] w-auto text-[var(--ink)] opacity-45" />
               </div>
             </div>
           </section>
