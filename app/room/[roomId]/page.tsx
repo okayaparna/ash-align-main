@@ -475,8 +475,12 @@ export default function RoomPage({
   useEffect(() => {
     setTab(livePhase);
   }, [livePhase]);
+  /* Creators arrive from the landing page having already given a name, so they
+     skip the name step — but they take the same survey the joiner does. They
+     used to be auto-joined on mount and never saw it, which left every creator
+     with a post-session score and no pre-session baseline to compare it to. */
   const [view, setViewRaw] = useState<ViewState>(
-    isCreator ? "joining" : "splash"
+    isCreator ? (urlName ? "survey-intro" : "name") : "splash"
   );
   const [transitioning, setTransitioning] = useState(false);
   /* Covers the very first paint of the room and dissolves off it. */
@@ -486,7 +490,7 @@ export default function RoomPage({
   const [threshold, setThreshold] = useState(false);
   const enteredChat = useRef(false);
   const lastPhase = useRef<string | null>(null);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(isCreator && urlName ? urlName : "");
   const [creatorName, setCreatorName] = useState<string | null>(null);
   const [toastVisible, setToastVisible] = useState(false);
 
@@ -548,14 +552,6 @@ export default function RoomPage({
       })
       .catch(() => {});
   }, [roomId, isCreator]);
-
-  // Auto-join for creators who come from the home page with name in URL
-  useEffect(() => {
-    if (isCreator && urlName && !joinAttempted.current) {
-      joinAttempted.current = true;
-      join(urlName);
-    }
-  }, [isCreator, urlName, join]);
 
   // Sync view state with session state
   useEffect(() => {
@@ -716,6 +712,8 @@ export default function RoomPage({
   // Screen 5: Survey intro
   if (view === "survey-intro") {
     const handleSkipSurvey = async () => {
+      if (joinAttempted.current) return;
+      joinAttempted.current = true;
       setViewRaw("joining");
       await join(name.trim());
     };
@@ -764,6 +762,8 @@ export default function RoomPage({
   // Screen 6: Pre-session survey
   if (view === "survey") {
     const handleSurveyComplete = async () => {
+      if (joinAttempted.current) return;
+      joinAttempted.current = true;
       setViewRaw("joining");
       await join(name.trim());
     };
