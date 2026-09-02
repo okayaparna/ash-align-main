@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import posthog from "posthog-js";
 import type { SurveyQuestion } from "@/lib/surveys";
 
@@ -11,6 +12,9 @@ interface SurveyScreenProps {
   questions: SurveyQuestion[];
   onComplete: () => void;
   onBack?: () => void;
+  /** Page to open on. Used to drop straight onto a trailing `link` page when
+   *  the questions were skipped from an intro screen. */
+  startIndex?: number;
 }
 
 function SingleChoiceInput({
@@ -44,10 +48,10 @@ function SingleChoiceInput({
               key={choice}
               type="button"
               onClick={() => onChange(choice)}
-              className={`flex h-[64px] w-full items-center rounded-[16px] px-[16px] text-left font-body text-[16px] font-normal leading-[1.5] transition-colors ${
+              className={`flex h-[64px] w-full items-center rounded-none px-[16px] text-left font-body text-[16px] font-normal leading-[1.5] transition-colors ${
                 selected
-                  ? "bg-[#171717] text-[#ffffff]"
-                  : "bg-[#f5f5f5] text-[#0a0a0a]"
+                  ? "bg-[var(--ink)] text-[var(--birch)]"
+                  : "bg-[rgba(0,0,0,0.05)] text-[var(--ink)]"
               }`}
             >
               <span className="flex-1">
@@ -59,7 +63,7 @@ function SingleChoiceInput({
                     onClick={(e) => e.stopPropagation()}
                     placeholder={choice}
                     autoFocus
-                    className="w-full bg-transparent font-body text-[16px] text-[#ffffff] outline-none placeholder:text-[#ffffff]/60"
+                    className="w-full bg-transparent font-body text-[16px] text-[var(--birch)] outline-none placeholder:text-[var(--birch)]/60"
                   />
                 ) : (
                   choice
@@ -99,10 +103,10 @@ function RatingInput({
             key={n}
             type="button"
             onClick={() => onChange(n)}
-            className={`flex h-11 w-11 items-center justify-center rounded-lg font-body text-[16px] font-medium transition-colors ${
+            className={`flex h-11 w-11 items-center justify-center rounded-none font-body text-[16px] font-medium transition-colors ${
               value === n
-                ? "bg-[#171717] text-[#ffffff]"
-                : "bg-[#f5f5f5] text-[#0a0a0a]"
+                ? "bg-[var(--ink)] text-[var(--birch)]"
+                : "bg-[rgba(0,0,0,0.05)] text-[var(--ink)]"
             }`}
           >
             {n}
@@ -128,8 +132,9 @@ export default function SurveyScreen({
   questions,
   onComplete,
   onBack,
+  startIndex = 0,
 }: SurveyScreenProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(startIndex);
   const [answers, setAnswers] = useState<Record<number, string | number>>({});
   const [openTexts, setOpenTexts] = useState<Record<number, string>>({});
   const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(null);
@@ -189,6 +194,11 @@ export default function SurveyScreen({
       submitSurvey(updatedAnswers);
       onComplete();
     } else {
+      // A trailing `link` page carries no answer, so the survey would never
+      // submit if we waited for it. Submit on the way in instead.
+      if (questions[currentIndex + 1]?.type === "link") {
+        submitSurvey(updatedAnswers);
+      }
       setTimeout(() => goToSlide(currentIndex + 1), 350);
     }
   };
@@ -198,13 +208,16 @@ export default function SurveyScreen({
       submitSurvey(answers);
       onComplete();
     } else {
+      if (questions[currentIndex + 1]?.type === "link") {
+        submitSurvey(answers);
+      }
       goToSlide(currentIndex + 1);
     }
   };
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-[#ffffff]">
-      <div className="px-6 pt-6">
+    <div className="flex min-h-[100dvh] flex-col bg-[var(--birch)]">
+      <div className="flex items-center justify-between px-6 pt-6">
         <button
           onClick={() => {
             if (currentIndex > 0) {
@@ -213,14 +226,29 @@ export default function SurveyScreen({
               onBack();
             }
           }}
-          className={`flex h-10 w-10 items-center justify-center rounded-full border border-[#f5f5f5] ${
+          aria-label="Back"
+          className={`flex h-10 w-10 items-center justify-center rounded-none border border-[var(--hairline)] ${
             currentIndex === 0 && !onBack ? "invisible" : ""
           }`}
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12.5 15L7.5 10L12.5 5" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M12.5 15L7.5 10L12.5 5" stroke="var(--ink)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
+
+        {/* Only the terminal page offers a way out — mid-survey there is nothing
+            to leave to, and the back button already covers stepping back. */}
+        {question.type === "link" && (
+          <Link
+            href="/"
+            aria-label="Close and return home"
+            className="flex h-10 w-10 items-center justify-center border border-[var(--hairline)] text-[var(--ink)] transition-colors duration-500 hover:bg-[var(--ink)] hover:text-[var(--birch)]"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" className="icon" aria-hidden="true">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </Link>
+        )}
       </div>
       <div className="animate-fade-in flex flex-col gap-4 px-6 pt-8 text-center lg:mx-auto lg:max-w-[600px]">
         {/* Progress dots */}
@@ -230,10 +258,10 @@ export default function SurveyScreen({
               key={i}
               className={`h-1.5 w-1.5 rounded-full transition-colors ${
                 i === currentIndex
-                  ? "bg-[#171717]"
+                  ? "bg-[var(--ink)]"
                   : i < currentIndex
-                    ? "bg-[#171717]/40"
-                    : "bg-[#f5f5f5]"
+                    ? "bg-[rgba(0,0,0,0.3)]"
+                    : "bg-[rgba(0,0,0,0.05)]"
               }`}
             />
           ))}
@@ -291,12 +319,39 @@ export default function SurveyScreen({
           />
         )}
 
-        <button
-          onClick={handleSkip}
-          className="pb-4 font-body text-[14px] font-bold text-[#737373]"
-        >
-          skip
-        </button>
+        {/* Terminal page: a recommendation and a way out, no answer to give. */}
+        {question.type === "link" && (
+          <div key={currentIndex} className="flex flex-col gap-6">
+            <h2 className="section-title text-center text-[26px] lg:text-[30px]">
+              {question.question}
+            </h2>
+            <a
+              href={question.linkUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                try {
+                  posthog.capture("app_store_link_clicked", { url: question.linkUrl });
+                } catch {
+                  // PostHog not initialized
+                }
+              }}
+              className="button button--black button--block"
+            >
+              {question.linkText}
+            </a>
+          </div>
+        )}
+
+        {/* Nothing to skip on the terminal page — it is the end of the flow. */}
+        {question.type !== "link" && (
+          <button
+            onClick={handleSkip}
+            className="pb-4 font-body text-[14px] font-bold text-[var(--contrast-weak)]"
+          >
+            skip
+          </button>
+        )}
       </div>
     </div>
   );
@@ -381,10 +436,10 @@ export function PostSurveyCard({
                       onClick={() =>
                         setAnswers((prev) => ({ ...prev, [i]: n }))
                       }
-                      className={`flex h-11 w-11 items-center justify-center rounded-full font-body text-[16px] font-medium transition-colors duration-200 ${
+                      className={`flex h-11 w-11 items-center justify-center rounded-none font-body text-[16px] font-medium transition-colors duration-200 ${
                         answers[i] === n
-                          ? "bg-[#171717] text-[#ffffff]"
-                          : "bg-[#f5f5f5] text-[#0a0a0a]"
+                          ? "bg-[var(--ink)] text-[var(--birch)]"
+                          : "bg-[rgba(0,0,0,0.05)] text-[var(--ink)]"
                       }`}
                     >
                       {n}
@@ -417,10 +472,10 @@ export function PostSurveyCard({
                       onClick={() =>
                         setAnswers((prev) => ({ ...prev, [i]: choice }))
                       }
-                      className={`flex h-11 items-center justify-center rounded-full px-6 font-body text-[16px] font-medium transition-colors duration-200 ${
+                      className={`flex h-11 items-center justify-center rounded-none px-6 font-body text-[16px] font-medium transition-colors duration-200 ${
                         answers[i] === choice
-                          ? "bg-[#171717] text-[#ffffff]"
-                          : "bg-[#f5f5f5] text-[#0a0a0a]"
+                          ? "bg-[var(--ink)] text-[var(--birch)]"
+                          : "bg-[rgba(0,0,0,0.05)] text-[var(--ink)]"
                       }`}
                     >
                       {choice}
@@ -449,7 +504,7 @@ export function PostSurveyCard({
                       // PostHog not initialized
                     }
                   }}
-                  className="flex h-[56px] w-full items-center justify-center rounded-[16px] bg-[#0a0a0a] font-body text-[16px] font-medium leading-[1.2] tracking-[-0.25px] text-[#ffffff]"
+                  className="flex h-[56px] w-full items-center justify-center rounded-none bg-[var(--ink)] font-body text-[16px] font-medium leading-[1.2] tracking-[-0.25px] text-[var(--birch)]"
                 >
                   {q.linkText}
                 </a>
@@ -473,7 +528,7 @@ export function PostSurveyCard({
                     }))
                   }
                   rows={3}
-                  className="w-full resize-none rounded-[16px] bg-[#f5f5f5] px-[24px] py-[16px] font-body text-[16px] text-[#0a0a0a] outline-none placeholder:text-[#0a0a0a]/40"
+                  className="w-full resize-none rounded-none bg-[rgba(0,0,0,0.05)] px-[24px] py-[16px] font-body text-[16px] text-[var(--ink)] outline-none placeholder:text-[var(--ink)]/40"
                 />
               </div>
             );
@@ -495,7 +550,7 @@ export function PostSurveyCard({
                       [i]: e.target.value,
                     }))
                   }
-                  className="h-[56px] w-full rounded-[16px] bg-[#f5f5f5] px-[24px] font-body text-[16px] text-[#0a0a0a] outline-none placeholder:text-[#0a0a0a]/40"
+                  className="h-[56px] w-full rounded-none bg-[rgba(0,0,0,0.05)] px-[24px] font-body text-[16px] text-[var(--ink)] outline-none placeholder:text-[var(--ink)]/40"
                 />
                 <p className="text-xs leading-[1.5] text-[var(--contrast-subtle)]">
                   {q.disclaimer}

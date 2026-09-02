@@ -48,7 +48,11 @@ export default function ChatInput({ disabled, placeholder, onSend }: ChatInputPr
   return (
     <form onSubmit={handleSubmit} className="px-5 pb-8 pt-2">
       <div
-        className="mx-auto flex min-h-[62px] w-full max-w-[610px] cursor-text items-center gap-2 rounded-full bg-[var(--bubble)] py-[7px] pl-6 pr-[7px]"
+        // items-start pins the send button to the top edge as the textarea
+        // grows. The textarea's 13px vertical padding makes a single line
+        // exactly as tall as the 48px button, so line one still reads as
+        // centred against it.
+        className="mx-auto flex min-h-[62px] w-full max-w-[610px] cursor-text items-start gap-2 rounded-none bg-[var(--bubble)] py-[7px] pl-6 pr-[7px]"
         onClick={() => textareaRef.current?.focus()}
       >
         <textarea
@@ -63,14 +67,14 @@ export default function ChatInput({ disabled, placeholder, onSend }: ChatInputPr
           placeholder={disabled ? "" : placeholder || "Text input"}
           disabled={disabled}
           rows={1}
-          className="msg-text flex-1 resize-none self-center bg-transparent py-2 text-[var(--chip-foreground)] outline-none placeholder:text-[var(--switch-inactive)] disabled:cursor-not-allowed"
+          className="msg-text flex-1 resize-none bg-transparent py-[13px] text-[var(--chip-foreground)] outline-none placeholder:text-[var(--switch-inactive)] disabled:cursor-not-allowed"
           style={{ maxHeight: "140px", overflowY: "auto" }}
         />
         <button
           type="submit"
           disabled={!canSubmit}
           aria-label="Send message"
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--action)] text-[var(--action-foreground)] transition-[background-color,color,opacity] duration-150 hover:opacity-88 disabled:bg-[#e0e0e0] disabled:text-[#a8a8a8]"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-none bg-[var(--action)] text-[var(--action-foreground)] transition-[background-color,color,opacity] duration-150 hover:opacity-88 disabled:bg-[var(--action-disabled)] disabled:text-[var(--action-disabled-foreground)]"
         >
           <ArrowUpwardIcon size={22} />
         </button>

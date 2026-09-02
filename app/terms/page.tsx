@@ -6,7 +6,7 @@ export default function TermsOfUse() {
   const router = useRouter();
 
   return (
-    <div className="min-h-[100dvh] bg-[var(--surface-bg)] px-6 py-12 lg:px-12">
+    <div className="min-h-[100dvh] bg-[var(--birch)] px-6 py-12 lg:px-12">
       <div className="mx-auto max-w-[720px]">
         <button
           onClick={() => {
@@ -16,7 +16,7 @@ export default function TermsOfUse() {
               window.close();
             }
           }}
-          className="mb-8 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-elevated)]"
+          className="mb-8 flex h-10 w-10 items-center justify-center rounded-none bg-[var(--surface-elevated)]"
           aria-label="Go back"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -24,14 +24,14 @@ export default function TermsOfUse() {
           </svg>
         </button>
 
-        <div className="mb-6 rounded-[var(--radius-sm)] bg-[var(--surface-elevated)] px-5 py-4">
+        <div className="mb-6 rounded-none bg-[var(--surface-elevated)] px-5 py-4">
           <p className="text-sm font-semibold uppercase leading-[1.5] text-[var(--contrast-strong)]">
             IF THIS IS A MEDICAL EMERGENCY OR CRISIS SITUATION, DIAL 911 OR YOUR LOCAL EMERGENCY NUMBER IMMEDIATELY. ASH ALIGN IS NOT AN EMERGENCY SERVICE AND CANNOT PROVIDE CRISIS INTERVENTION.
           </p>
         </div>
 
         <div className="mb-6 flex flex-col gap-4">
-          <div className="rounded-[24px] bg-[var(--surface-elevated)] p-[24px]">
+          <div className="rounded-none bg-[var(--surface-elevated)] p-[24px]">
             <p className="font-body text-[18px] font-bold leading-[1.2] tracking-[-0.1px] text-[var(--contrast-strong)]">
               Ash is an AI communication tool &mdash; not therapy
             </p>
@@ -39,7 +39,7 @@ export default function TermsOfUse() {
               Ash Align uses AI to help facilitate conversation. It is not a substitute for professional therapy, counseling, or medical care. Do not delay seeking professional help based on this experience.
             </p>
           </div>
-          <div className="rounded-[24px] bg-[var(--surface-elevated)] p-[24px]">
+          <div className="rounded-none bg-[var(--surface-elevated)] p-[24px]">
             <p className="font-body text-[18px] font-bold leading-[1.2] tracking-[-0.1px] text-[var(--contrast-strong)]">
               Your data disappears when you&apos;re done
             </p>

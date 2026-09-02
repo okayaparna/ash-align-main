@@ -38,12 +38,11 @@ The DB schema only has two phases (`intake`, `commons`), no `wrap_up_ready` colu
 - `lib/supabase.ts` — Supabase client initialization
 - `hooks/useSession.ts` — Client-side session hook (polling, send, ready, wrapUp)
 - `hooks/useAutoScroll.ts` — Auto-scroll with double `requestAnimationFrame` for reliable timing
-- `app/page.tsx` — Landing/setup page (splash → info → setup → share flow for room creator)
+- `app/page.tsx` — Landing/setup page (split-screen splash → info → setup → share, for the room creator)
 - `app/room/[roomId]/page.tsx` — Main room page (all phases rendered here; joiner flow: onboarding → name → chat)
-- `components/BrushBackground.tsx` — Generative art background using p5.js + p5.brush (two variants: "flow" and "alignment")
 - `components/MessageList.tsx` — Scrollable message area with optional footer slot for inline notices
 - `components/MessageBubble.tsx` — Individual message rendering; splits assistant messages on `\n\n` into multiple bubbles
-- `components/FinishedScreen.tsx` — Three-section conclusion display (summary/insight/recommendations) with alignment brush art
+- `components/FinishedScreen.tsx` — Three-section conclusion display (summary/insight/recommendations) on flat 5% panels
 - `components/ChatInput.tsx` — Message input bar
 - `components/TypingIndicator.tsx` — Animated typing dots
 
@@ -58,99 +57,206 @@ The DB schema only has two phases (`intake`, `commons`), no `wrap_up_ready` colu
 
 ## Design System
 
-**shadcn/ui (new-york style, base color: neutral) on Tailwind CSS v4.**
-Configured in `components.json`; tokens live in `app/globals.css`; `cn()` helper in `lib/utils.ts`.
-Primitives are in `components/ui/` — add more with `npx shadcn@latest add <name>`.
+**Ported wholesale from https://meadowell.com/ (see "Reference site" below).**
+shadcn/ui (new-york style) still provides the primitives, but every token now
+resolves onto the meadowell palette. Tokens live in `app/globals.css`; `cn()`
+helper in `lib/utils.ts`; primitives in `components/ui/`.
+
+### Reference site
+The palette, type roles, button geometry, field skin, square corners and icon
+style are lifted from meadowell.com's own computed styles, not approximated.
+When adding UI, check the reference before inventing something.
+
+### Palette
+Four primitives, defined in `:root` — there is **no white and no gray ramp**.
+Depth comes from black at low alpha over the birch ground.
+
+| Token | Value | Role |
+|---|---|---|
+| `--birch` | `#edebe4` | page ground, every screen |
+| `--ink` | `#000000` | type, and the "black" button |
+| `--brand` | `#ead268` | brand yellow, primary CTA, "you" |
+| `--green` | `#d6ebc5` | the one supporting accent, "your partner" |
+
+Every shadcn token maps onto these (`--background: var(--birch)`,
+`--primary: var(--brand)`, `--muted: rgba(0,0,0,0.05)`, and so on), and the
+legacy Ash Align aliases (`--surface-bg`, `--contrast-*`, `--wood-*`,
+`--olive-*`, `--damson-*`) all resolve there too, so the ~200 existing call
+sites keep working. Prefer `var(--birch)` / `var(--ink)` in new code.
 
 ### Fonts
-- **Geist** (`font-sans`, `--font-geist-sans`) — Body text, loaded via `next/font/google` in `app/layout.tsx`
-- **Geist Mono** (`font-mono`, `--font-geist-mono`) — Monospace
-- `.font-display` is Geist at weight 500 with `-0.025em` tracking. The serif
-  (Instrument Serif) it used to carry is preserved as a comment on that rule in
-  `globals.css` if the serif direction is ever revived.
+The reference site runs Displaay's **Season** superfamily everywhere. Here it is
+**scoped to headings only** — Season never touches the chat surface, because a
+licensed display face on every message bubble is heavy to load and to read.
 
-### Color Tokens (CSS custom properties)
-Canonical shadcn neutral set, defined in `:root` with a `.dark` block:
-`--background --foreground --card --popover --primary --secondary --muted
---accent --destructive --border --input --ring --chart-1..5 --sidebar-*`.
-Exposed to Tailwind as `bg-background`, `text-muted-foreground`, `border-border`,
-etc. via the `@theme inline` block.
+| Role | Face | CSS variable |
+|---|---|---|
+| Headings (`.section-title`, `.font-display`, `.ui-subhead`, drop cap) | Season Mix 400/500/600 | `--font-display-src` |
+| Eyebrows (`.eyebrow` / `.small-text`) | Season Sans SemiBold | `--font-kicker-src` |
+| Everything else — body, buttons, fields, **the whole chat** | Inter 400/500/600 | `--font-ui-src` |
 
-**Legacy aliases.** The former Ash Align tokens still exist, but every one now
-resolves onto the neutral scale — nothing is warm or green any more:
-- `--surface-bg` → `--background`, `--surface-elevated` → `--muted`
-- `--contrast-strong` → `--foreground`, `--contrast-weak` / `--ink-soft` → `--muted-foreground`
-- `--hairline` → `--border`
-- `--wood-*`, `--olive-*`, `--damson-*` → neutral steps (they were semantic
-  signal only by this point). Prefer the shadcn tokens in new code; the aliases
-  exist so ~200 existing call sites keep working.
+Eyebrows keep a Season face because they are section kickers sitting above the
+headings (they are `<h2>`/`<h3>` on the reference site too), not chat chrome.
 
-### Spacing
-- `--radius: 0.625rem` (10px), with `--radius-sm/md/lg/xl` derived from it
-  (shadcn convention). `--radius-pill: 999px` is an Ash Align extra.
+**The Season files in `app/fonts/season/` are TRIAL cuts.** The filenames keep
+the `TRIAL` marker deliberately so this stays visible. They must be swapped for
+licensed files before this ships to production — drop licensed `.woff2` into
+that folder and update the paths in `app/layout.tsx`. Nothing else in the
+codebase names a typeface. They sit in `app/fonts/` rather than `public/` so
+Next serves hashed copies and the raw trial files aren't downloadable from a
+guessable URL.
 
-### Chat interface (Figma 81-1431, Material 3 kit)
-The room UI follows the Figma frame; the header's motion and tooltips follow
-https://iamnoman.com/shop.
+### Type roles
+Straight off the reference's computed styles:
+
+- `.section-title` — `clamp(34px, 4.6vw, 56px)` at **line-height 1.0**. Set
+  solid is the reference's signature; do not add leading.
+- Body — 16px / 1.3 on the display face. This is the `body` default.
+- `.eyebrow` (their `.small-text`) — 11px uppercase, `0.1em`, UI face 600.
+  Every kicker, field label and section label.
+- `.ui-subhead` — 19px display face for inline sub-headings.
+
+### Shape and motion
+- **Square everywhere.** `--radius: 0`, and `--radius-sm/md/lg/xl` and
+  `--radius-pill` all collapse to it. The only round things are avatars
+  (`--radius-circle`), loading dots and spinners.
+- `--ease-slow: 1s cubic-bezier(0.16, 1, 0.3, 1)` — the reference's button
+  cross-fade, which *inverts the fill* rather than changing opacity.
+- `--ease-ui: 280ms cubic-bezier(0.23, 1, 0.32, 1)` — sliding UI (switch thumb).
+
+### Buttons
+One class with variants, geometry copied exactly: 14px / line-height 1 /
+`0.02em` on the UI face, `1.15rem 1.6rem` padding, square.
+
+- `.button` — yellow fill, black label. Hovers to black.
+- `.button--black` — black fill, birch label. Hovers to yellow.
+- `.button--basic` — 1px black outline, transparent. Hovers to black.
+- `.button--block` — full width, slightly taller. For the flow CTAs.
+- `.ui-pill` / `.ui-pill-solid` are kept as aliases of `--basic` / default.
+
+### Fields
+`.field` — black-at-5% fill, **no border**, square, `1rem` padding, `0.02em`
+tracking on the UI face. Focus deepens the fill and adds an inset bottom rule.
+
+### Icons
+The reference uses 24-unit stroke icons: `currentColor`, `stroke-width: 1.8`,
+round caps and joins, no fill. The `.icon` class applies that spec, and
+`lucide-react` (already a dependency) matches it out of the box. The remaining
+Material Symbols in `components/icons/MaterialIcons.tsx` are filled-path and
+are the one place that still departs from the reference.
+
+**Gotcha: keep component classes in `@layer components`.** `.button`, `.chip`,
+`.action-btn` etc. set `display` and `width`; unlayered CSS beats every Tailwind
+utility, so `hidden lg:inline-flex` or `mt-7` on a `.button` would silently do
+nothing. The whole ported block is wrapped in that layer for this reason.
+
+### Chat interface (Figma 81-1431, re-skinned onto the reference)
+Layout geometry is still the Figma frame; the skin is meadowell.
 
 - **Header, three zones** — participant chips left, phase switcher + copy-link
   centre, phase action right. No bottom rule.
-- **Participant chips** (`.chip`) are colour-coded: `--chip-self` (pink) is you,
-  `--chip-partner` (lavender) is your partner. The Material icon carries status —
-  `chat_dashed` while they're still talking, `mark_chat_read` (bubble + check)
-  once they're ready / wrapped up.
-- **Mobile header** stays on one row by condensing, per the mobile design:
-  below `lg` the chips become 40px `.chip-avatar` circles carrying the initial
-  (overlapping by 12px, `-ml-3`, self on top), turning into a check when done;
-  below `md` the action button collapses to a 44px circle with a check, the
-  copy-link is hidden, and the switcher drops to 13px / 10px padding.
-  At 375 the two switcher labels need 222px and have 227px — it is tight, and a
-  long name (`Alexandria's room`) will ellipsize rather than overflow.
-  Verified clear at 1440 / 1024 / 820 / 768 / 375.
-
-**Gotcha: keep component classes in `@layer components`.** `.chip`,
-`.action-btn` etc. set `display`, and unlayered CSS beats every Tailwind
-utility — `hidden lg:inline-flex` silently did nothing and both the pill and the
-avatar rendered at once. Anything a utility may need to override belongs in that
-layer. Same trap on one element: `Tooltip`'s root is `inline-flex`, so passing
-it `hidden md:inline-flex` loses; hide it from a wrapper (`hidden md:contents`).
-
-**Thumb positioning.** `.phase-switch-thumb` needs an explicit `left: 0`.
-Without it the absolutely-positioned box takes its static position, already
-inset by the track's 4px padding, and the measured `translateX` double-counts —
-the thumb overhangs the track on the last segment.
+- **Participant chips** (`.chip`) are square and colour-coded with the two brand
+  accents: `--chip-self` (brand yellow) is you, `--chip-partner` (green) is your
+  partner. The Material icon carries status — `chat_dashed` while they're still
+  talking, `mark_chat_read` once they're ready / wrapped up.
+- **Mobile header** stays on one row by condensing: below `lg` the chips become
+  40px `.chip-avatar` **circles** (the one deliberate round element) carrying the
+  initial, overlapping by 12px with self on top; below `md` the action button
+  collapses to a 44px square with a check, the copy-link is hidden, and the
+  switcher drops to 13px / 10px padding. Verified at 1440 / 1280 / 375.
 - **Phase switcher** (`components/PhaseSwitch.tsx`) moves between your private
   room and the commons. The thumb is *measured*, not fixed-width, because the
   two labels differ in length; it re-measures on resize and after fonts load.
-  Slide easing is `280ms cubic-bezier(0.23, 1, 0.32, 1)`.
-- **Tooltips** (`components/Tooltip.tsx`, `.ui-tooltip`) match the reference
-  exactly: `#242529` chip, 11px/14px, 8px radius,
-  `0 8px 24px -12px rgba(0,0,0,.28)`, 150ms `cubic-bezier(0.23, 1, 0.32, 1)`.
-  Pass `align="start" | "end"` for controls against a viewport edge, or the
-  centred tooltip clips.
-- **Bubbles** — `.msg-bubble`, 20px radius with an 8px tail corner pointing at
-  the speaker, `--bubble` (#f0f0f0) fill, 16px/20px padding, max-width 72%.
-  Ash carries no bubble in any phase: plain left-aligned text.
-- **Type scale** — `--msg-size` / `--msg-leading` (16/24) drive all chat text;
+  **Thumb positioning:** `.phase-switch-thumb` needs an explicit `left: 0`.
+  Without it the absolutely-positioned box takes its static position, already
+  inset by the track's 4px padding, and the measured `translateX` double-counts.
+- **Tooltips** (`components/Tooltip.tsx`, `.ui-tooltip`) are now a square black
+  chip with birch uppercase 11px text. Pass `align="start" | "end"` for controls
+  against a viewport edge, or the centred tooltip clips. `Tooltip`'s root is
+  `inline-flex`, so hide it from a wrapper (`hidden md:contents`), not by
+  passing it `hidden md:inline-flex`.
+- **Bubbles** — `.msg-bubble`, square, 16px/20px padding, max-width 72%. There
+  is no tail corner any more; the speaker is told by side and fill —
+  `.msg-bubble-mine` is brand yellow, `.msg-bubble-theirs` is the 5% tint. Ash
+  carries no bubble in any phase: plain left-aligned text.
+- **Type scale** — `--msg-size` / `--msg-leading` (16/22) drive all chat text;
   `--ui-size` / `--ui-leading` (14/20) drive the header. Two lines to rescale.
-- **Column** is `max-w-[610px]`, and messages are bottom-anchored (`mt-auto`)
-  so a short conversation sits just above the composer.
-- **Composer** is a filled `--bubble` pill with a 48px `--action` send button.
-  Disabled whenever the visible tab isn't the room's live phase.
-- **Icons** are Material Symbols outlined 400, inlined from
-  `@material-symbols/svg-400` into `components/icons/MaterialIcons.tsx`.
-  Keep the `0 -960 960 960` viewBox when adding more.
+- **Column** is `max-w-[610px]`, and messages are bottom-anchored (`mt-auto`).
+- **Composer** is a square `--bubble` field with a 48px square `--action` send
+  button. Disabled whenever the visible tab isn't the room's live phase.
+
+### The "How this works" page and its sheet
+`InfoScreen` in `app/page.tsx` is two layers:
+
+- **Base** — the three step cards, on a `sticky top-0 h-[100dvh]` layer over a
+  5%-black ground so the sheet (birch-ish `--paper`) reads as lighter on top.
+  The cards carry no artwork; the space above each card's copy is the slot for
+  illustrations to be dropped in later.
+- **Sheet** — a document that starts peeking `PAPER_PEEK` (132px) above the
+  fold via a negative top margin, rides up over the pinned steps as you scroll,
+  and slides back down to reveal them when you scroll away.
+
+**All the movement is `position: sticky` plus that negative margin — there is no
+scroll-jacking.** Scroll position only drives the tilt/settle: the sheet sits at
+−3.2° and scales up to square as it rises, and a "Scroll to read" label on the
+exposed strip fades out. The tilt is suppressed below `lg`, because a rotated
+full-bleed element overhangs horizontally and would force a sideways scrollbar
+where there is no margin beside it. Verified 0px horizontal overflow at 1280.
+
+**Don't wrap the sticky layer in `overflow-hidden`** — an ancestor with any
+overflow other than `visible` silently kills `position: sticky`.
+
+The sheet's skin is modelled on the reference site's letterhead: `--paper`
+stock, monospace `.sheet-meta` rows across the head, `.sheet-rule` hairlines, a
+`.sheet-punch` hole in the left margin, and `.sheet-body` typewriter copy. The
+body stays sentence case; the reference sets its letter in uppercase, which
+works for a few lines and punishes several paragraphs. The wording is our own —
+only the treatment is borrowed.
+
+### Grain
+`.grain` lays a tiled fractal-noise SVG over a positioned ancestor via `::after`
+(0.22 / `overlay`), so photography sits on the same slightly-analogue surface as
+the paper. `.grain--paper` is the softer pass for the sheet (0.5 / `multiply`).
+The hero `::after` sits at `z-1`, so the scrim and wordmark are pushed to `z-5`
+and the sheet's own content to `z-2` to stay above it.
+
+### Split-screen first pages
+Both entry points use the same composition: full-bleed imagery in the left half
+with the `Ash` wordmark laid over it, birch content column in the right half
+(`section-title`, subcopy, square consent checkbox, full-width `.button--black`).
+Below `lg` it stacks — image band at `42vh`, content beneath.
+
+- Creator: `SplashScreen` in `app/page.tsx`. The left pane is `lg:sticky` and
+  the right column scrolls on into the "What this is / is not" essay.
+- Joiner: `SplashScreen` in `app/room/[roomId]/page.tsx`. Same frame; the three
+  words of the title stagger in at 200/520/840ms.
+
+**Imagery.** Both read `HERO_IMAGE = "/hero.jpg"` and render it through
+`next/image` with `fill` + `priority`, so it is served as AVIF/WebP at a size
+matched to the viewport. Source photos live outside the repo in
+`portfolio-S26/ash_align_portfolio/filler_images/`. `public/card-1..3.svg` are
+still palette-matched placeholders for the info carousel.
+
+**Wordmark and scrim.** `components/AshWordmark.tsx` inlines the real mark with
+`fill="currentColor"`, so one component covers the black and white variants —
+set the colour with a text utility on the caller. Over the hero it is
+`text-[var(--birch)]` (white), because the photograph is dark where the mark
+sits on desktop.
+
+A top scrim sits between the photo and the mark: black-to-transparent, 40% tall,
+45% opacity. This is lifted from the reference site's own hero
+(`.hero--home::after`) and it is load-bearing, not decoration — without it the
+mobile crop lands the wordmark on pale hair at 3.4:1, below WCAG AA. With it,
+measured 6.7:1 at 375 and 15.7:1 at 1280. **If you change the photograph,
+re-check those two numbers** rather than assuming white still works.
 
 ### Full-screen transitions
 `TransitionScreen` in `app/room/[roomId]/page.tsx` renders all three holds
 (bouncing dots + heading + optional subtitle). They short-circuit the chat
 render, so no header or composer shows:
 1. **`waitingForPartner`** — intake, you're ready and your partner isn't.
-   Static copy naming them. This is the screen you land on straight after
-   "I'm Ready"; the composer is closed at that point anyway, so holding here
-   beats leaving them in a chat they can't type into.
 2. **`bothReadyWaiting` / `commonsLoading`** — both ready, or commons has no
-   messages yet. Rotates `transitionMessages` every 3s via `transitionMsgIndex`.
+   messages yet. Rotates `transitionMessages` every 3s.
 3. **`conclusionLoading`** — both wrapped up.
 
 ### Reading back your private room
@@ -159,14 +265,14 @@ tab stays readable after the room moves to commons. No schema change — it is a
 second read of the same `messages` table filtered by `intake_participant_id`.
 The composer is closed on any tab that isn't the live phase.
 
-### Deliberate exception
-`components/BrushBackground.tsx` and `components/FlowBackground.tsx` keep their
-original green/brown generative-art palettes. They are artwork, not UI chrome.
-Neutralise them by hand if the grayscale should extend to the backgrounds.
+### Dead code
+`components/BrushBackground.tsx` and `components/FlowBackground.tsx` (p5.js
+generative art, old green/brown palette) are **no longer imported anywhere**.
+They survive the palette change only because nothing renders them.
 
-`app/uipreview/page.tsx` is a standalone mockup with its own private palette and
-Instrument Serif headings. It is untouched, kept as a record of the previous
-design direction.
+`app/uipreview/page.tsx` is a standalone mockup with its own private palette. It
+is untouched, kept as a record of a previous design direction.
+
 
 ## Figma Reference
 Primary file: `IBIPLegu5KnTMGlJvNy223`
@@ -177,34 +283,9 @@ Primary file: `IBIPLegu5KnTMGlJvNy223`
 - Polling-based updates (not websockets) — 1.5s interval via `useSession` hook
 - Wrap-up status displayed as inline notices in the message stream (not a fixed bottom bar) using `WrapUpNotice` component with `WrapUpIcon`
 - Participant status icons are phase-aware (typing indicator normally, checkmark when action taken)
-- Send button is neutral in every phase (was wood/damson before the shadcn reset)
+- Send button is black in every phase, hovering to brand yellow like every other button
 - Assistant messages split on `\n\n` into multiple bubbles for readability
 - `remark-breaks` plugin used in ReactMarkdown for single-newline line breaks
-
-## BrushBackground Component
-
-The generative art background (`components/BrushBackground.tsx`) uses **p5.js 2.0.1 + p5.brush 2.0.0-beta** loaded dynamically via `<script>` tags.
-
-### Two Variants
-- **`"flow"`** — Standard Perlin noise flow field for loading/transition screens
-- **`"alignment"`** — Two streams (top green/olive, bottom warm/brown) converge toward center using blended noise + gravitational pull. Used on splash screen and conclusion screen.
-
-### Key Technical Details
-- **Must use p5.js 2.0+** because p5.brush 2.0.0-beta requires WebGL2 (`webgl2` version check)
-- **Instance mode** via `brush.instance(p)` — required since the component is embedded in React
-- **WEBGL coordinate system** requires `p.translate(-w/2, -h/2)` to shift origin to top-left
-- **Static rendering** — all drawing happens in `setup()` with `p.noLoop()`; p5.brush is not designed for frame-by-frame animation
-- **Deferred initialization** — uses `requestIdleCallback`/`setTimeout` to yield to the main thread before heavy rendering, so the page UI (buttons etc.) remains interactive during script loading and canvas drawing
-- **Mobile performance** — line counts are reduced on screens < 768px wide (e.g., 200→80 lines per stream for alignment, 500→200 for flow) to prevent the main thread from blocking for 10+ seconds
-- **Script loading** — handles race conditions from React strict mode double-mounting by tracking `data-loaded` attribute and listening for load events on existing script tags
-
-### Convergence Field Algorithm (Alignment Variant)
-```
-pullAngle = atan2(centerY - cy, (centerX - cx) * 0.15)  // mostly vertical pull
-distFromCenter = abs(cy - centerY) / (h/2)
-pullStr = distFromCenter² * 0.7                           // quadratic falloff
-angle = pullAngle + (noiseAngle - pullAngle) * (1 - pullStr)  // blend with circular interpolation
-```
 
 ## Prompt Engineering Notes
 
@@ -221,17 +302,47 @@ When a participant clicks "Wrap Up" in the commons phase:
 1. **One partner wraps up**: An inline gray notice appears in the message stream: "{Name} has indicated that they are ready to **wrap up** this conversation..." The other user can keep chatting and sees the "Wrap Up" button in the top bar.
 2. **The initiator sees**: "You have indicated that you are ready to **wrap up**. Waiting for {partner} to also wrap up..."
 3. **Both wrap up**: A green notice appears: "Both parties are ready to wrap up. Synthesizing this chat into a conclusion." Then the app transitions to a full-screen loading state while the conclusion is generated.
-4. **Conclusion screen**: Three-section display (summary/insight/recommendations) with alignment brush background and Tally feedback iframe.
+4. **Conclusion screen**: Three-section display (summary/insight/recommendations)
+   on flat 5% panels over the birch ground, closing with an **"End this session"**
+   CTA.
+5. **Post-session survey**: The CTA moves `FinishedScreen`'s local `step` to
+   `"intro"` — a "Before you go" screen explaining that the answers are
+   anonymous research data, with Continue / skip, mirroring the pre-session
+   `survey-intro`. Continue then hands off to the same paged `SurveyScreen`
+   used before the session (one question per screen, auto-advance, progress
+   dots, back button). The questions used to sit inline on the conclusion as a
+   `PostSurveyCard`; that component is now unused.
+
+   **Skip** jumps to the last page via `SurveyScreen`'s `startIndex` prop rather
+   than dead-ending, so people still land on the closing recommendation — and
+   because nothing *advances* into that page, nothing is recorded, which is the
+   right outcome for a skip.
+
+   `SurveyScreen` gained support for the `link` question type so the trailing
+   "Talk to Ash" recommendation is just the last page of the survey rather than
+   a special case. Three consequences worth knowing: a `link` page carries no
+   answer, so **the survey submits on the way *into* it** rather than on the way
+   out (see `advance()` / `handleSkip()`); the `skip` control is hidden there
+   because it is the terminal screen; and that page alone carries an **X at top
+   right linking to `/`**, since it is the only point in the flow with somewhere
+   to leave to.
 
 ## Home/Landing Page Flow
 
 ### Creator Flow (app/page.tsx)
-1. **Splash** — Logo + "Align" title + brush background (alignment variant) + "Begin" button + disclaimer text
-2. **Info** — Three horizontally-scrollable cards explaining the process
-3. **Setup** — Name entry (no brush background)
-4. **Share** — Copy link + enter room
+1. **Splash** — Split screen: imagery + `Ash` wordmark left, "Align with Ash" +
+   consent + Begin right. Scrolls on into the "What this is / is not" essay.
+2. **Info** — Three step cards on a pinned layer, with the "What this is /
+   is not" document riding over them on scroll (see above). Both that sheet and
+   the steps layer carry an "Enter the journey" CTA.
+3. **Setup** — Name entry
+4. **Share** — The room link sits in a row with a square copy button beside it
+   (not an icon inside the field); the copy button copies and fires the toast,
+   and the block CTA below is "Enter your room".
 
 ### Joiner Flow (app/room/[roomId]/page.tsx)
-1. **Onboarding** — Simple welcome screen
-2. **Name** — Name entry (no brush background — removed to match creator flow)
-3. **Chat** — Enters intake phase directly
+1. **Onboarding** — The same split screen, with the title's three words
+   staggering in. This is the screen the reference comp was drawn against.
+2. **Name** — Name entry
+3. **Survey intro / survey** — Optional pre-session questions (skippable)
+4. **Chat** — Enters intake phase directly

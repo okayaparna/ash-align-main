@@ -25,7 +25,7 @@ function LikertScale({
             key={n}
             type="button"
             onClick={() => onChange(n)}
-            className={`flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] border text-sm font-medium transition-colors ${
+            className={`flex h-11 w-11 items-center justify-center rounded-none border text-sm font-medium transition-colors ${
               value === n
                 ? "border-[var(--damson-400)] bg-[var(--damson-600)] text-[var(--damson-200)]"
                 : "border-[var(--surface-high)] text-[var(--contrast-medium)] hover:border-[var(--damson-300)]"
@@ -118,7 +118,7 @@ export default function PostSurvey({ onComplete, roomId }: PostSurveyProps) {
         <button
           onClick={handleSubmit}
           disabled={!allAnswered}
-          className="flex h-14 w-full items-center justify-center rounded-[var(--radius-md)] bg-[var(--damson-600)] text-base font-semibold leading-[1.2] tracking-[-0.25px] text-[var(--damson-200)] disabled:opacity-40"
+          className="flex h-14 w-full items-center justify-center rounded-none bg-[var(--damson-600)] text-base font-semibold leading-[1.2] tracking-[-0.25px] text-[var(--damson-200)] disabled:opacity-40"
         >
           Done
         </button>

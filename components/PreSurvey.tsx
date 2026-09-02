@@ -61,10 +61,10 @@ function RadioGroup({
             key={opt}
             type="button"
             onClick={() => onChange(opt)}
-            className={`flex h-[64px] cursor-pointer items-center rounded-[16px] px-[16px] font-body text-[16px] font-normal leading-[1.5] transition-colors ${
+            className={`flex h-[64px] cursor-pointer items-center rounded-none px-[16px] font-body text-[16px] font-normal leading-[1.5] transition-colors ${
               selected
-                ? "bg-[#171717] text-[#ffffff]"
-                : "bg-[#f5f5f5] text-[#0a0a0a]"
+                ? "bg-[var(--ink)] text-[var(--birch)]"
+                : "bg-[rgba(0,0,0,0.05)] text-[var(--ink)]"
             }`}
           >
             {opt}
@@ -75,10 +75,10 @@ function RadioGroup({
         <button
           type="button"
           onClick={() => onChange("__other__")}
-          className={`flex h-[64px] cursor-pointer items-center rounded-[16px] px-[16px] font-body text-[16px] font-normal leading-[1.5] transition-colors ${
+          className={`flex h-[64px] cursor-pointer items-center rounded-none px-[16px] font-body text-[16px] font-normal leading-[1.5] transition-colors ${
             other.enabled && value === "__other__"
-              ? "bg-[#171717] text-[#ffffff]"
-              : "bg-[#f5f5f5] text-[#0a0a0a]"
+              ? "bg-[var(--ink)] text-[var(--birch)]"
+              : "bg-[rgba(0,0,0,0.05)] text-[var(--ink)]"
           }`}
         >
           {other.enabled && value === "__other__" ? (
@@ -91,7 +91,7 @@ function RadioGroup({
               }}
               onClick={(e) => e.stopPropagation()}
               autoFocus
-              className="w-full bg-transparent font-body text-[16px] text-[#ffffff] outline-none placeholder:text-[#ffffff]/60"
+              className="w-full bg-transparent font-body text-[16px] text-[var(--birch)] outline-none placeholder:text-[var(--birch)]/60"
             />
           ) : (
             other.placeholder
@@ -119,10 +119,10 @@ function LikertScale({
             key={n}
             type="button"
             onClick={() => onChange(n)}
-            className={`flex h-11 w-11 items-center justify-center rounded-lg font-body text-[16px] font-medium transition-colors ${
+            className={`flex h-11 w-11 items-center justify-center rounded-none font-body text-[16px] font-medium transition-colors ${
               value === n
-                ? "bg-[#171717] text-[#ffffff]"
-                : "bg-[#f5f5f5] text-[#0a0a0a]"
+                ? "bg-[var(--ink)] text-[var(--birch)]"
+                : "bg-[rgba(0,0,0,0.05)] text-[var(--ink)]"
             }`}
             aria-label={`${n} - ${LIKERT_LABELS[n - 1] || ""}`}
           >
@@ -184,12 +184,12 @@ export default function PreSurvey({ onComplete, roomId }: PreSurveyProps) {
   };
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-[#ffffff]">
+    <div className="flex min-h-[100dvh] flex-col bg-[var(--birch)]">
       <div className="animate-fade-in flex flex-col gap-3 px-6 pt-20 text-center lg:mx-auto lg:max-w-[600px]">
-        <h1 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
+        <h1 className="section-title text-[34px] lg:text-[44px]">
           Help Ash understand your relationship
         </h1>
-        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#404040]">
+        <p className="text-[16px] leading-[1.35] text-[var(--contrast-medium)]">
           5 quick questions help Ash personalize your session. Your responses
           are anonymous and used for research only.
         </p>
@@ -278,7 +278,7 @@ export default function PreSurvey({ onComplete, roomId }: PreSurveyProps) {
         <button
           onClick={handleSubmit}
           disabled={!allAnswered}
-          className="flex h-[64px] w-full items-center justify-center rounded-[var(--radius-pill)] bg-[var(--contrast-strong)] transition-opacity hover:opacity-85 font-body text-[17px] font-medium leading-[1.2] tracking-[-0.011em] text-[var(--surface-bg)] disabled:opacity-40"
+          className="button button--black button--block"
         >
           Continue
         </button>

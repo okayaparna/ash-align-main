@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePostHog } from "posthog-js/react";
 
-const FONT_STYLE = { fontFamily: 'var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif', letterSpacing: '-0.025em' };
+const FONT_STYLE = { fontFamily: 'var(--font-display-src), ui-sans-serif, system-ui, sans-serif', letterSpacing: '-0.01em' };
 
 const INIT = "INIT";
 const SUBMITTING = "SUBMITTING";
@@ -20,8 +20,8 @@ const formStyles = {
   formFontSizePx: 14,
   buttonText: "Join Waitlist",
   buttonFont: "Inter",
-  buttonFontColor: "#ffffff",
-  buttonColor: "#171717",
+  buttonFontColor: "#edebe4",
+  buttonColor: "#000000",
   buttonFontSizePx: 14,
   successMessage: "Thanks! We'll be in touch!",
   successFont: "Inter",
@@ -144,7 +144,7 @@ function LoopsSignUpForm() {
         </div>
         <button
           style={{
-            color: "#737373",
+            color: "var(--contrast-weak)",
             font: "14px, Inter, sans-serif",
             margin: "10px auto",
             textAlign: "center",
@@ -227,7 +227,7 @@ function LoopsSignUpForm() {
 
 export default function Home() {
   return (
-    <div className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[var(--surface-bg)]">
+    <div className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[var(--birch)]">
       <div className="z-10 mx-auto flex w-full max-w-[520px] flex-col items-center px-6">
         {/* Title */}
         <div className="flex items-baseline justify-center" style={{ gap: "clamp(8px, 2vw, 14px)" }}>

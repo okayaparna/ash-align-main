@@ -7,6 +7,9 @@ import { useAutoScroll } from "@/hooks/useAutoScroll";
 import { useSession } from "@/hooks/useSession";
 import type { ChatMessage, RoomState } from "@/lib/types";
 
+import Image from "next/image";
+import AshWordmark from "@/components/AshWordmark";
+import { PixelCurtain, PixelMosaic } from "@/components/PixelLoader";
 import ChatInput from "@/components/ChatInput";
 import FinishedScreen from "@/components/FinishedScreen";
 import MessageList from "@/components/MessageList";
@@ -19,124 +22,116 @@ import { PRE_SURVEY_ID, PRE_SURVEY_QUESTIONS, PRE_SURVEY_QUESTIONS_B, isSurveyTe
 
 type ViewState = "splash" | "name" | "survey-intro" | "survey" | "joining" | "chat" | "error";
 
-const FONT_STYLE = { fontFamily: 'var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif', letterSpacing: '-0.025em' };
+
+/* Joiner's first screen. Same split composition as the creator's landing:
+   full-bleed imagery on the left with the wordmark over it, birch content
+   column on the right. The three words still stagger in, but in place — the
+   old big-to-small choreography assumed a centred full-bleed layout. */
+const HERO_IMAGE = "/hero.jpg";
 
 function SplashScreen({ onBegin }: { onBegin: () => void }) {
-  const [showAlign, setShowAlign] = useState(false);
-  const [showWith, setShowWith] = useState(false);
-  const [showAsh, setShowAsh] = useState(false);
-  const [phase, setPhase] = useState<"big" | "small">("big");
+  const [shown, setShown] = useState(0);
   const [consentChecked, setConsentChecked] = useState(false);
 
   useEffect(() => {
-    const t1 = setTimeout(() => setShowAlign(true), 200);
-    const t2 = setTimeout(() => setShowWith(true), 700);
-    const t3 = setTimeout(() => setShowAsh(true), 1200);
-    const t4 = setTimeout(() => setPhase("small"), 2800);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+    const timers = [200, 520, 840].map((ms, i) =>
+      setTimeout(() => setShown((n) => Math.max(n, i + 1)), ms)
+    );
+    return () => timers.forEach(clearTimeout);
   }, []);
 
-  const wordTransition = "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)";
+  const word = (i: number): React.CSSProperties => ({
+    display: "inline-block",
+    transition: "opacity 700ms cubic-bezier(0.16, 1, 0.3, 1), transform 700ms cubic-bezier(0.16, 1, 0.3, 1)",
+    opacity: shown > i ? 1 : 0,
+    transform: shown > i ? "translateY(0)" : "translateY(10px)",
+  });
 
   return (
-    <div className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[var(--surface-bg)]">
-      <div
-        className="z-10 flex flex-col items-center"
-        style={{
-          transition: "transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
-          transform: phase === "small" ? "translateY(-20px)" : "translateY(0)",
-        }}
-      >
+    <div className="min-h-[100dvh] bg-[var(--birch)] lg:grid lg:grid-cols-2">
+      {/* Left: imagery. Swap HERO_IMAGE for the real photograph. */}
+      <div className="grain relative h-[42vh] overflow-hidden bg-[rgba(0,0,0,0.06)] lg:sticky lg:top-0 lg:h-[100dvh]">
+        <Image
+          src={HERO_IMAGE}
+          alt=""
+          aria-hidden="true"
+          fill
+          priority
+          sizes="(min-width: 1024px) 50vw, 100vw"
+          className="object-cover"
+        />
+        {/* Top scrim. The reference site does exactly this on its hero
+            (.hero--home::after: black-to-transparent, 46% tall, 0.4 opacity).
+            Here it earns its place twice over: the mobile crop lands the
+            wordmark on pale hair, where white alone measured 3.4:1. */}
         <div
-          className="relative flex items-baseline justify-center"
-          style={{
-            transition: "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
-            gap: phase === "big" ? "0px" : "clamp(8px, 2vw, 14px)",
-          }}
-        >
-          <span
-            className="text-[var(--wood-700)]"
-            style={{
-              ...FONT_STYLE,
-              transition: wordTransition,
-              fontSize: phase === "big" ? "clamp(72px, 18vw, 160px)" : "clamp(48px, 10vw, 72px)",
-              lineHeight: 1,
-              letterSpacing: phase === "big" ? "-5px" : "-3px",
-              transform: phase === "big" ? "translateX(clamp(-30px, -5vw, -60px)) translateY(clamp(-25px, -5vw, -50px))" : "translateX(0) translateY(0)",
-              opacity: showAlign ? 1 : 0,
-            }}
-          >
-            Align
-          </span>
-          <span
-            className="text-[var(--wood-700)]"
-            style={{
-              ...FONT_STYLE,
-              transition: wordTransition,
-              fontSize: phase === "big" ? "clamp(36px, 9vw, 80px)" : "clamp(28px, 6vw, 40px)",
-              lineHeight: 1,
-              letterSpacing: "-2px",
-              transform: phase === "big" ? "translateX(0px) translateY(clamp(8px, 2vw, 15px))" : "translateX(0) translateY(0)",
-              opacity: showWith ? 1 : 0,
-            }}
-          >
-            with
-          </span>
-          <span
-            className="text-[var(--wood-700)]"
-            style={{
-              ...FONT_STYLE,
-              transition: wordTransition,
-              fontSize: phase === "big" ? "clamp(64px, 16vw, 140px)" : "clamp(48px, 10vw, 72px)",
-              lineHeight: 1,
-              letterSpacing: phase === "big" ? "-4px" : "-3px",
-              transform: phase === "big" ? "translateX(clamp(30px, 5vw, 60px)) translateY(clamp(40px, 8vw, 80px))" : "translateX(0) translateY(0)",
-              opacity: showAsh ? 1 : 0,
-            }}
-          >
-            Ash
-          </span>
-        </div>
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-[40%] bg-gradient-to-b from-black/45 to-transparent"
+        />
+        {/* White, not black: the photograph is dark where the mark sits at
+            desktop, and the scrim carries it everywhere else. */}
+        <AshWordmark
+          className="absolute left-6 top-5 z-10 h-[26px] w-auto text-[var(--birch)] lg:left-9 lg:top-8 lg:h-[30px]"
+          style={{ filter: "drop-shadow(0 1px 6px rgba(0,0,0,0.35))" }}
+        />
       </div>
 
-      <div
-        className="z-10 mx-auto mt-8 flex w-full max-w-[465px] flex-col items-center gap-8 px-6 text-center"
-        style={{
-          transition: "opacity 0.8s ease-in-out 0.4s",
-          opacity: phase === "small" ? 1 : 0,
-          pointerEvents: phase === "small" ? "auto" : "none",
-        }}
-      >
-        <p className="max-w-[320px] text-sm leading-[1.5] text-[var(--contrast-weak)]">
-          You&apos;ve been invited to try a new tool for relationships. This is a demo and everything you share here disappears when you&apos;re done.
-        </p>
-        <label className="flex cursor-pointer items-start gap-3 text-left">
-          <input
-            type="checkbox"
-            checked={consentChecked}
-            onChange={(e) => setConsentChecked(e.target.checked)}
-            className="mt-0.5 h-[17px] w-[17px] shrink-0 cursor-pointer rounded-[4px] border-[#404040] accent-[#171717]"
-          />
-          <span className="font-body text-[12px] font-normal leading-[1.5] text-[var(--contrast-weak)]">
-            I am 18 or older, and I agree to the{" "}
-            <a
-              href="/terms"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-bold underline text-[var(--contrast-strong)]"
-              onClick={(e) => e.stopPropagation()}
+      {/* Right: content column */}
+      <div className="flex flex-col justify-center px-6 py-16 sm:px-10 lg:min-h-[100dvh] lg:px-16 xl:px-24">
+        <div className="w-full max-w-[440px]">
+          <h1 className="section-title">
+            <span style={word(0)}>Align</span>{" "}
+            <span style={word(1)}>with</span>{" "}
+            <span style={word(2)}>Ash</span>
+          </h1>
+          <p className="mt-6 max-w-[400px] text-[16px] leading-[1.3] text-[var(--contrast-medium)]">
+            You&apos;ve been invited to try a new tool for relationships. This is a
+            demo and everything you share here disappears when you&apos;re done.
+          </p>
+
+          <div className="mt-16 lg:mt-24">
+            <label className="flex cursor-pointer items-start gap-3 text-left">
+              <span className="relative mt-px inline-flex h-[18px] w-[18px] shrink-0">
+                <input
+                  type="checkbox"
+                  checked={consentChecked}
+                  onChange={(e) => setConsentChecked(e.target.checked)}
+                  className="peer h-[18px] w-[18px] cursor-pointer appearance-none border border-[var(--ink)] bg-transparent transition-colors checked:bg-[var(--ink)]"
+                />
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 m-auto h-3 w-3 text-[var(--birch)] opacity-0 transition-opacity peer-checked:opacity-100"
+                  fill="none"
+                  stroke="currentColor"
+                  style={{ strokeWidth: 3, strokeLinecap: "round", strokeLinejoin: "round" }}
+                >
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+              </span>
+              <span className="text-[14px] leading-[1.4] text-[var(--contrast-medium)]">
+                I am 18 or older, and I agree to the{" "}
+                <a
+                  href="/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 text-[var(--ink)]"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Terms of Use
+                </a>
+              </span>
+            </label>
+
+            <button
+              onClick={onBegin}
+              disabled={!consentChecked}
+              className="button button--black button--block mt-7"
             >
-              Terms of Use
-            </a>
-          </span>
-        </label>
-        <button
-          onClick={onBegin}
-          disabled={!consentChecked}
-          className="flex h-[64px] w-full items-center justify-center rounded-[var(--radius-pill)] bg-[var(--contrast-strong)] transition-opacity hover:opacity-85 font-body text-[17px] font-medium leading-[1.2] tracking-[-0.011em] text-[var(--surface-bg)] disabled:opacity-40"
-        >
-          Begin
-        </button>
+              Begin
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -156,11 +151,7 @@ function TransitionScreen({
   return (
     <div className="relative flex h-[100dvh] flex-col items-center justify-center overflow-hidden bg-background px-6">
       <div className="animate-fade-in relative z-10 flex flex-col items-center gap-6 text-center">
-        <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 animate-bounce rounded-full bg-[var(--switch-inactive)] [animation-delay:0ms]" />
-          <span className="h-2.5 w-2.5 animate-bounce rounded-full bg-[var(--switch-inactive)] [animation-delay:120ms]" />
-          <span className="h-2.5 w-2.5 animate-bounce rounded-full bg-[var(--switch-inactive)] [animation-delay:240ms]" />
-        </div>
+        <PixelMosaic />
         <h2
           key={titleKey}
           className="font-display animate-fade-in max-w-[320px] text-[22px] leading-[1.25] text-[var(--chip-foreground)]"
@@ -179,7 +170,7 @@ function TransitionScreen({
 function Toast({ message, visible }: { message: string; visible: boolean }) {
   return (
     <div
-      className={`ui-text pointer-events-none fixed left-1/2 top-[104px] z-50 -translate-x-1/2 rounded-full bg-[var(--action)] px-4 py-2 font-medium text-[var(--action-foreground)] transition-all duration-300 ${visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"}`}
+      className={`ui-text pointer-events-none fixed left-1/2 top-[104px] z-50 -translate-x-1/2 rounded-none bg-[var(--action)] px-4 py-2 font-medium text-[var(--action-foreground)] transition-all duration-300 ${visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"}`}
     >
       {message}
     </div>
@@ -488,6 +479,13 @@ export default function RoomPage({
     isCreator ? "joining" : "splash"
   );
   const [transitioning, setTransitioning] = useState(false);
+  /* Covers the very first paint of the room and dissolves off it. */
+  const [booting, setBooting] = useState(true);
+  /* A dissolve laid over the two thresholds that matter: arriving in your own
+     room, and the room opening into the commons. */
+  const [threshold, setThreshold] = useState(false);
+  const enteredChat = useRef(false);
+  const lastPhase = useRef<string | null>(null);
   const [name, setName] = useState("");
   const [creatorName, setCreatorName] = useState<string | null>(null);
   const [toastVisible, setToastVisible] = useState(false);
@@ -509,6 +507,25 @@ export default function RoomPage({
   );
   const joinAttempted = useRef(false);
   const [transitionMsgIndex, setTransitionMsgIndex] = useState(0);
+
+  /* Two thresholds get the dissolve: landing in your own room for the first
+     time, and the room opening into the commons. Both are guarded by a ref so
+     the curtain fires once per crossing rather than on every poll. */
+  useEffect(() => {
+    if (view !== "chat" || enteredChat.current) return;
+    enteredChat.current = true;
+    setThreshold(true);
+  }, [view]);
+
+  useEffect(() => {
+    const phase = roomState?.phase;
+    if (!phase) return;
+    const previous = lastPhase.current;
+    lastPhase.current = phase;
+    if (previous && previous !== phase && phase === "commons") {
+      setThreshold(true);
+    }
+  }, [roomState?.phase]);
 
   const copyRoomLink = useCallback(async () => {
     const url = `${window.location.origin}/room/${roomId}`;
@@ -630,7 +647,12 @@ export default function RoomPage({
 
   // Screen 1: Welcome splash (animated)
   if (view === "splash") {
-    return <SplashScreen onBegin={() => setView("name")} />;
+    return (
+      <>
+        {booting ? <PixelCurtain onDone={() => setBooting(false)} /> : null}
+        <SplashScreen onBegin={() => setView("name")} />
+      </>
+    );
   }
 
   const pageTransition: React.CSSProperties = {
@@ -641,29 +663,29 @@ export default function RoomPage({
   // Screen 2: Name entry
   if (view === "name") {
     return (
-      <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-[#ffffff]" style={pageTransition}>
+      <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-[var(--birch)]" style={pageTransition}>
         <div className="px-6 pt-6">
           <button
             onClick={() => setView("splash")}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f5f5f5]"
+            className="flex h-11 w-11 items-center justify-center border border-[var(--hairline)] text-[var(--ink)] transition-colors duration-500 hover:bg-[var(--ink)] hover:text-[var(--birch)]"
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12.5 15L7.5 10L12.5 5" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg width="18" height="18" viewBox="0 0 24 24" className="icon" aria-hidden="true">
+              <path d="M19 12H5M11 18l-6-6 6-6" />
             </svg>
           </button>
         </div>
 
         <div className="animate-fade-in flex flex-col gap-4 px-6 pt-8 text-center lg:mx-auto lg:max-w-[600px]">
-          <h1 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
+          <h1 className="section-title text-[34px] lg:text-[44px]">
             To begin with,
           </h1>
-          <p className="font-body text-[16px] font-normal leading-[1.5] text-[#404040]">
+          <p className="text-[16px] leading-[1.35] text-[var(--contrast-medium)]">
             What should Ash call you during the session?
           </p>
         </div>
 
         <div className="relative z-10 mx-auto mt-16 flex w-full max-w-[465px] flex-col gap-3 px-6">
-          <label className="font-body text-[12px] font-medium uppercase leading-[1.2] tracking-[1.25px] text-[#737373]">
+          <label className="eyebrow text-[var(--contrast-weak)]">
             Your name
           </label>
           <input
@@ -672,7 +694,7 @@ export default function RoomPage({
             onKeyDown={(e) => {
               if (e.key === "Enter" && name.trim()) setView("survey-intro");
             }}
-            className="h-[64px] rounded-[16px] bg-[#f5f5f5] px-[24px] font-body text-[16px] text-[#0a0a0a] outline-none"
+            className="field h-[60px]"
             placeholder="Enter your name"
             autoFocus
           />
@@ -682,7 +704,7 @@ export default function RoomPage({
           <button
             onClick={() => setView("survey-intro")}
             disabled={!name.trim()}
-            className="flex h-[64px] w-full items-center justify-center rounded-[var(--radius-pill)] bg-[var(--contrast-strong)] transition-opacity hover:opacity-85 font-body text-[17px] font-medium leading-[1.2] tracking-[-0.011em] text-[var(--surface-bg)] disabled:opacity-40"
+            className="button button--black button--block"
           >
             Continue
           </button>
@@ -699,23 +721,23 @@ export default function RoomPage({
     };
 
     return (
-      <div className="flex min-h-[100dvh] flex-col bg-[#ffffff]" style={pageTransition}>
+      <div className="flex min-h-[100dvh] flex-col bg-[var(--birch)]" style={pageTransition}>
         <div className="px-6 pt-6">
           <button
             onClick={() => setView("name")}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f5f5f5]"
+            className="flex h-11 w-11 items-center justify-center border border-[var(--hairline)] text-[var(--ink)] transition-colors duration-500 hover:bg-[var(--ink)] hover:text-[var(--birch)]"
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12.5 15L7.5 10L12.5 5" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg width="18" height="18" viewBox="0 0 24 24" className="icon" aria-hidden="true">
+              <path d="M19 12H5M11 18l-6-6 6-6" />
             </svg>
           </button>
         </div>
 
         <div className="animate-fade-in flex flex-col gap-4 px-6 pt-8 text-center lg:mx-auto lg:max-w-[600px]">
-          <h1 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
+          <h1 className="section-title text-[34px] lg:text-[44px]">
             Alright {name.trim()}, Ash wants to understand your relationship
           </h1>
-          <p className="font-body text-[16px] font-normal leading-[1.5] text-[#404040]">
+          <p className="text-[16px] leading-[1.35] text-[var(--contrast-medium)]">
             {isSurveyTestVariant() ? "3" : "5"} quick questions help Ash personalize your session. Your responses
             are anonymous and used for research only.
           </p>
@@ -724,13 +746,13 @@ export default function RoomPage({
         <div className="mx-auto mt-16 flex w-full max-w-[465px] flex-col items-center gap-4 px-6">
           <button
             onClick={() => setView("survey")}
-            className="flex h-[64px] w-full items-center justify-center rounded-[var(--radius-pill)] bg-[var(--contrast-strong)] transition-opacity hover:opacity-85 font-body text-[17px] font-medium leading-[1.2] tracking-[-0.011em] text-[var(--surface-bg)]"
+            className="button button--black button--block"
           >
             Continue
           </button>
           <button
             onClick={handleSkipSurvey}
-            className="font-body text-[14px] font-bold text-[#737373]"
+            className="font-body text-[14px] font-bold text-[var(--contrast-weak)]"
           >
             skip
           </button>
@@ -761,9 +783,9 @@ export default function RoomPage({
   // Loading / joining state
   if (view === "joining" || (view !== "chat" && view !== "error")) {
     return (
-      <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-[var(--surface-bg)]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--surface-elevated)] border-t-[var(--wood-600)]" />
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-[var(--birch)]">
+        <div className="flex flex-col items-center gap-6">
+          <PixelMosaic />
           <p className="text-base text-[var(--contrast-weak)]">
             Entering your private room...
           </p>
@@ -775,7 +797,7 @@ export default function RoomPage({
   // Error state
   if (view === "error") {
     return (
-      <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-[var(--surface-bg)] px-6">
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-[var(--birch)] px-6">
         <div className="flex flex-col items-center gap-4 text-center">
           <p className="text-lg font-medium text-[var(--contrast-strong)]">
             Something went wrong
@@ -809,16 +831,16 @@ export default function RoomPage({
   // Session ended early (safety concern)
   if (roomState.phase === "ended") {
     return (
-      <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-[var(--surface-bg)] px-6">
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-[var(--birch)] px-6">
         <div className="mx-auto flex max-w-[480px] flex-col items-center gap-6 text-center">
           <h1 className="font-display text-[28px] leading-[1.18] tracking-[-1px] text-[var(--wood-700)]">
             This session has ended
           </h1>
-          <p className="text-[16px] leading-[1.6] text-[#404040]">
+          <p className="text-[16px] leading-[1.6] text-[var(--contrast-medium)]">
             This session is no longer active. If you need support, please reach out to a professional.
           </p>
-          <div className="mt-2 w-full rounded-[16px] bg-[#fef2f2] p-6 text-left">
-            <p className="mb-3 text-[15px] font-semibold text-[#404040]">
+          <div className="mt-2 w-full rounded-none bg-[#fef2f2] p-6 text-left">
+            <p className="mb-3 text-[15px] font-semibold text-[var(--contrast-medium)]">
               If you or someone you know needs help:
             </p>
             <div className="flex flex-col gap-3">
@@ -828,7 +850,7 @@ export default function RoomPage({
               >
                 National Domestic Violence Hotline: 1-800-799-7233
               </a>
-              <p className="text-[14px] text-[#404040]">
+              <p className="text-[14px] text-[var(--contrast-medium)]">
                 Or text <span className="font-semibold">START</span> to <span className="font-semibold">88788</span>
               </p>
               <a
@@ -961,7 +983,8 @@ export default function RoomPage({
           : null;
 
   return (
-    <div className="flex h-[100dvh] flex-col bg-[var(--surface-bg)] text-[var(--contrast-strong)]">
+    <div className="flex h-[100dvh] flex-col bg-[var(--birch)] text-[var(--contrast-strong)]">
+      {threshold ? <PixelCurtain onDone={() => setThreshold(false)} /> : null}
       <Toast message="Link copied to clipboard" visible={toastVisible} />
       <TopBar
         roomState={roomState}
@@ -1018,13 +1041,13 @@ export default function RoomPage({
                   <button
                     onClick={raiseHand}
                     disabled={handRaiseLoading}
-                    className="ui-text flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[var(--bubble)] px-3.5 font-medium text-[var(--chip-foreground)] transition-colors hover:bg-[#e6e6e6] disabled:opacity-60"
+                    className="ui-text flex h-9 shrink-0 items-center gap-1.5 rounded-none bg-[var(--bubble)] px-3.5 font-medium text-[var(--chip-foreground)] transition-colors hover:bg-[rgba(0,0,0,0.09)] disabled:opacity-60"
                   >
                     <HandRaiseIcon color="currentColor" />
                     Raise my hand
                   </button>
                 ) : (
-                  <div className="ui-text flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[var(--action)] px-3.5 font-medium text-[var(--action-foreground)]">
+                  <div className="ui-text flex h-9 shrink-0 items-center gap-1.5 rounded-none bg-[var(--action)] px-3.5 font-medium text-[var(--action-foreground)]">
                     <HandRaiseIcon color="currentColor" />
                     Hand raised
                   </div>
