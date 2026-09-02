@@ -569,8 +569,10 @@ function ShareScreen({
       </div>
 
       <div className="mx-auto mt-6 w-full max-w-[465px] px-6">
+        {/* Not "Enter your room" — creators take the pre-session survey next,
+            so promising the room here would be a lie for one screen. */}
         <button onClick={onEnter} className="button button--black button--block">
-          Enter your room
+          Continue
         </button>
       </div>
     </div>
