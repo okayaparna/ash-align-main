@@ -46,8 +46,8 @@ function SingleChoiceInput({
               onClick={() => onChange(choice)}
               className={`flex h-[64px] w-full items-center rounded-[16px] px-[16px] text-left font-body text-[16px] font-normal leading-[1.5] transition-colors ${
                 selected
-                  ? "bg-[#a66c94] text-[#fcfcfc]"
-                  : "bg-[#f1f0ed] text-[#282828]"
+                  ? "bg-[#171717] text-[#ffffff]"
+                  : "bg-[#f5f5f5] text-[#0a0a0a]"
               }`}
             >
               <span className="flex-1">
@@ -59,7 +59,7 @@ function SingleChoiceInput({
                     onClick={(e) => e.stopPropagation()}
                     placeholder={choice}
                     autoFocus
-                    className="w-full bg-transparent font-body text-[16px] text-[#fcfcfc] outline-none placeholder:text-[#fcfcfc]/60"
+                    className="w-full bg-transparent font-body text-[16px] text-[#ffffff] outline-none placeholder:text-[#ffffff]/60"
                   />
                 ) : (
                   choice
@@ -101,8 +101,8 @@ function RatingInput({
             onClick={() => onChange(n)}
             className={`flex h-11 w-11 items-center justify-center rounded-lg font-body text-[16px] font-medium transition-colors ${
               value === n
-                ? "bg-[#a66c94] text-[#fcfcfc]"
-                : "bg-[#f1f0ed] text-[#282828]"
+                ? "bg-[#171717] text-[#ffffff]"
+                : "bg-[#f5f5f5] text-[#0a0a0a]"
             }`}
           >
             {n}
@@ -203,7 +203,7 @@ export default function SurveyScreen({
   };
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-[#fcfcfc]">
+    <div className="flex min-h-[100dvh] flex-col bg-[#ffffff]">
       <div className="px-6 pt-6">
         <button
           onClick={() => {
@@ -213,12 +213,12 @@ export default function SurveyScreen({
               onBack();
             }
           }}
-          className={`flex h-10 w-10 items-center justify-center rounded-full border border-[#f1f0ed] ${
+          className={`flex h-10 w-10 items-center justify-center rounded-full border border-[#f5f5f5] ${
             currentIndex === 0 && !onBack ? "invisible" : ""
           }`}
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12.5 15L7.5 10L12.5 5" stroke="#282828" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M12.5 15L7.5 10L12.5 5" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
       </div>
@@ -230,10 +230,10 @@ export default function SurveyScreen({
               key={i}
               className={`h-1.5 w-1.5 rounded-full transition-colors ${
                 i === currentIndex
-                  ? "bg-[#8e521f]"
+                  ? "bg-[#171717]"
                   : i < currentIndex
-                    ? "bg-[#8e521f]/40"
-                    : "bg-[#f1f0ed]"
+                    ? "bg-[#171717]/40"
+                    : "bg-[#f5f5f5]"
               }`}
             />
           ))}
@@ -293,7 +293,7 @@ export default function SurveyScreen({
 
         <button
           onClick={handleSkip}
-          className="pb-4 font-body text-[14px] font-bold text-[#6b6b6b]"
+          className="pb-4 font-body text-[14px] font-bold text-[#737373]"
         >
           skip
         </button>
@@ -383,8 +383,8 @@ export function PostSurveyCard({
                       }
                       className={`flex h-11 w-11 items-center justify-center rounded-full font-body text-[16px] font-medium transition-colors duration-200 ${
                         answers[i] === n
-                          ? "bg-[#a66c94] text-[#fcfcfc]"
-                          : "bg-[#f1f0ed] text-[#282828]"
+                          ? "bg-[#171717] text-[#ffffff]"
+                          : "bg-[#f5f5f5] text-[#0a0a0a]"
                       }`}
                     >
                       {n}
@@ -419,8 +419,8 @@ export function PostSurveyCard({
                       }
                       className={`flex h-11 items-center justify-center rounded-full px-6 font-body text-[16px] font-medium transition-colors duration-200 ${
                         answers[i] === choice
-                          ? "bg-[#a66c94] text-[#fcfcfc]"
-                          : "bg-[#f1f0ed] text-[#282828]"
+                          ? "bg-[#171717] text-[#ffffff]"
+                          : "bg-[#f5f5f5] text-[#0a0a0a]"
                       }`}
                     >
                       {choice}
@@ -449,7 +449,7 @@ export function PostSurveyCard({
                       // PostHog not initialized
                     }
                   }}
-                  className="flex h-[56px] w-full items-center justify-center rounded-[16px] bg-[#282828] font-body text-[16px] font-medium leading-[1.2] tracking-[-0.25px] text-[#fcfcfc]"
+                  className="flex h-[56px] w-full items-center justify-center rounded-[16px] bg-[#0a0a0a] font-body text-[16px] font-medium leading-[1.2] tracking-[-0.25px] text-[#ffffff]"
                 >
                   {q.linkText}
                 </a>
@@ -473,7 +473,7 @@ export function PostSurveyCard({
                     }))
                   }
                   rows={3}
-                  className="w-full resize-none rounded-[16px] bg-[#f1f0ed] px-[24px] py-[16px] font-body text-[16px] text-[#282828] outline-none placeholder:text-[#282828]/40"
+                  className="w-full resize-none rounded-[16px] bg-[#f5f5f5] px-[24px] py-[16px] font-body text-[16px] text-[#0a0a0a] outline-none placeholder:text-[#0a0a0a]/40"
                 />
               </div>
             );
@@ -495,7 +495,7 @@ export function PostSurveyCard({
                       [i]: e.target.value,
                     }))
                   }
-                  className="h-[56px] w-full rounded-[16px] bg-[#f1f0ed] px-[24px] font-body text-[16px] text-[#282828] outline-none placeholder:text-[#282828]/40"
+                  className="h-[56px] w-full rounded-[16px] bg-[#f5f5f5] px-[24px] font-body text-[16px] text-[#0a0a0a] outline-none placeholder:text-[#0a0a0a]/40"
                 />
                 <p className="text-xs leading-[1.5] text-[var(--contrast-subtle)]">
                   {q.disclaimer}

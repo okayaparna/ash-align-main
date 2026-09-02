@@ -58,26 +58,115 @@ The DB schema only has two phases (`intake`, `commons`), no `wrap_up_ready` colu
 
 ## Design System
 
+**shadcn/ui (new-york style, base color: neutral) on Tailwind CSS v4.**
+Configured in `components.json`; tokens live in `app/globals.css`; `cn()` helper in `lib/utils.ts`.
+Primitives are in `components/ui/` — add more with `npx shadcn@latest add <name>`.
+
 ### Fonts
-- **Google Sans** (`font-sans`) — Body text
-- **Libre Baskerville** (`font-display`) — Headings and display text
-- **Libertinus Serif** — "Align" title on splash screen only
+- **Geist** (`font-sans`, `--font-geist-sans`) — Body text, loaded via `next/font/google` in `app/layout.tsx`
+- **Geist Mono** (`font-mono`, `--font-geist-mono`) — Monospace
+- `.font-display` is Geist at weight 500 with `-0.025em` tracking. The serif
+  (Instrument Serif) it used to carry is preserved as a comment on that rule in
+  `globals.css` if the serif direction is ever revived.
 
 ### Color Tokens (CSS custom properties)
-- `--wood-*` (50–800) — Warm brown, used in intake phase
-- `--olive-*` (50–700) — Green, used for ready states and intake accents
-- `--damson-*` (200–800) — Deep purple-green, used in commons phase
-- `--surface-*` (bg, elevated, high) — Background layers
-- `--contrast-*` (strong, medium, weak, subtle) — Text hierarchy
+Canonical shadcn neutral set, defined in `:root` with a `.dark` block:
+`--background --foreground --card --popover --primary --secondary --muted
+--accent --destructive --border --input --ring --chart-1..5 --sidebar-*`.
+Exposed to Tailwind as `bg-background`, `text-muted-foreground`, `border-border`,
+etc. via the `@theme inline` block.
+
+**Legacy aliases.** The former Ash Align tokens still exist, but every one now
+resolves onto the neutral scale — nothing is warm or green any more:
+- `--surface-bg` → `--background`, `--surface-elevated` → `--muted`
+- `--contrast-strong` → `--foreground`, `--contrast-weak` / `--ink-soft` → `--muted-foreground`
+- `--hairline` → `--border`
+- `--wood-*`, `--olive-*`, `--damson-*` → neutral steps (they were semantic
+  signal only by this point). Prefer the shadcn tokens in new code; the aliases
+  exist so ~200 existing call sites keep working.
 
 ### Spacing
-- `--radius-sm` (8px), `--radius-md` (16px), `--radius-lg` (24px), `--radius-pill` (32px)
+- `--radius: 0.625rem` (10px), with `--radius-sm/md/lg/xl` derived from it
+  (shadcn convention). `--radius-pill: 999px` is an Ash Align extra.
 
-### Layout Rules
-- Message column and chat input: `max-w-[600px]` centered on desktop
-- Desktop: reduced padding on header/footer (`lg:pt-4`, `lg:pb-4`)
-- Mobile: compact padding (`pb-6` on input, `pb-8` on status bars)
-- No border above message bar on desktop (`lg:border-t-0`)
+### Chat interface (Figma 81-1431, Material 3 kit)
+The room UI follows the Figma frame; the header's motion and tooltips follow
+https://iamnoman.com/shop.
+
+- **Header, three zones** — participant chips left, phase switcher + copy-link
+  centre, phase action right. No bottom rule.
+- **Participant chips** (`.chip`) are colour-coded: `--chip-self` (pink) is you,
+  `--chip-partner` (lavender) is your partner. The Material icon carries status —
+  `chat_dashed` while they're still talking, `mark_chat_read` (bubble + check)
+  once they're ready / wrapped up.
+- **Mobile header** stays on one row by condensing, per the mobile design:
+  below `lg` the chips become 40px `.chip-avatar` circles carrying the initial
+  (overlapping by 12px, `-ml-3`, self on top), turning into a check when done;
+  below `md` the action button collapses to a 44px circle with a check, the
+  copy-link is hidden, and the switcher drops to 13px / 10px padding.
+  At 375 the two switcher labels need 222px and have 227px — it is tight, and a
+  long name (`Alexandria's room`) will ellipsize rather than overflow.
+  Verified clear at 1440 / 1024 / 820 / 768 / 375.
+
+**Gotcha: keep component classes in `@layer components`.** `.chip`,
+`.action-btn` etc. set `display`, and unlayered CSS beats every Tailwind
+utility — `hidden lg:inline-flex` silently did nothing and both the pill and the
+avatar rendered at once. Anything a utility may need to override belongs in that
+layer. Same trap on one element: `Tooltip`'s root is `inline-flex`, so passing
+it `hidden md:inline-flex` loses; hide it from a wrapper (`hidden md:contents`).
+
+**Thumb positioning.** `.phase-switch-thumb` needs an explicit `left: 0`.
+Without it the absolutely-positioned box takes its static position, already
+inset by the track's 4px padding, and the measured `translateX` double-counts —
+the thumb overhangs the track on the last segment.
+- **Phase switcher** (`components/PhaseSwitch.tsx`) moves between your private
+  room and the commons. The thumb is *measured*, not fixed-width, because the
+  two labels differ in length; it re-measures on resize and after fonts load.
+  Slide easing is `280ms cubic-bezier(0.23, 1, 0.32, 1)`.
+- **Tooltips** (`components/Tooltip.tsx`, `.ui-tooltip`) match the reference
+  exactly: `#242529` chip, 11px/14px, 8px radius,
+  `0 8px 24px -12px rgba(0,0,0,.28)`, 150ms `cubic-bezier(0.23, 1, 0.32, 1)`.
+  Pass `align="start" | "end"` for controls against a viewport edge, or the
+  centred tooltip clips.
+- **Bubbles** — `.msg-bubble`, 20px radius with an 8px tail corner pointing at
+  the speaker, `--bubble` (#f0f0f0) fill, 16px/20px padding, max-width 72%.
+  Ash carries no bubble in any phase: plain left-aligned text.
+- **Type scale** — `--msg-size` / `--msg-leading` (16/24) drive all chat text;
+  `--ui-size` / `--ui-leading` (14/20) drive the header. Two lines to rescale.
+- **Column** is `max-w-[610px]`, and messages are bottom-anchored (`mt-auto`)
+  so a short conversation sits just above the composer.
+- **Composer** is a filled `--bubble` pill with a 48px `--action` send button.
+  Disabled whenever the visible tab isn't the room's live phase.
+- **Icons** are Material Symbols outlined 400, inlined from
+  `@material-symbols/svg-400` into `components/icons/MaterialIcons.tsx`.
+  Keep the `0 -960 960 960` viewBox when adding more.
+
+### Full-screen transitions
+`TransitionScreen` in `app/room/[roomId]/page.tsx` renders all three holds
+(bouncing dots + heading + optional subtitle). They short-circuit the chat
+render, so no header or composer shows:
+1. **`waitingForPartner`** — intake, you're ready and your partner isn't.
+   Static copy naming them. This is the screen you land on straight after
+   "I'm Ready"; the composer is closed at that point anyway, so holding here
+   beats leaving them in a chat they can't type into.
+2. **`bothReadyWaiting` / `commonsLoading`** — both ready, or commons has no
+   messages yet. Rotates `transitionMessages` every 3s via `transitionMsgIndex`.
+3. **`conclusionLoading`** — both wrapped up.
+
+### Reading back your private room
+`pollRoom()` returns `intakeMessages` alongside `messages`, so the "your room"
+tab stays readable after the room moves to commons. No schema change — it is a
+second read of the same `messages` table filtered by `intake_participant_id`.
+The composer is closed on any tab that isn't the live phase.
+
+### Deliberate exception
+`components/BrushBackground.tsx` and `components/FlowBackground.tsx` keep their
+original green/brown generative-art palettes. They are artwork, not UI chrome.
+Neutralise them by hand if the grayscale should extend to the backgrounds.
+
+`app/uipreview/page.tsx` is a standalone mockup with its own private palette and
+Instrument Serif headings. It is untouched, kept as a record of the previous
+design direction.
 
 ## Figma Reference
 Primary file: `IBIPLegu5KnTMGlJvNy223`
@@ -88,7 +177,7 @@ Primary file: `IBIPLegu5KnTMGlJvNy223`
 - Polling-based updates (not websockets) — 1.5s interval via `useSession` hook
 - Wrap-up status displayed as inline notices in the message stream (not a fixed bottom bar) using `WrapUpNotice` component with `WrapUpIcon`
 - Participant status icons are phase-aware (typing indicator normally, checkmark when action taken)
-- Send button color changes by phase: wood in intake, damson in commons
+- Send button is neutral in every phase (was wood/damson before the shadcn reset)
 - Assistant messages split on `\n\n` into multiple bubbles for readability
 - `remark-breaks` plugin used in ReactMarkdown for single-newline line breaks
 

@@ -63,8 +63,8 @@ function RadioGroup({
             onClick={() => onChange(opt)}
             className={`flex h-[64px] cursor-pointer items-center rounded-[16px] px-[16px] font-body text-[16px] font-normal leading-[1.5] transition-colors ${
               selected
-                ? "bg-[#a66c94] text-[#fcfcfc]"
-                : "bg-[#f1f0ed] text-[#282828]"
+                ? "bg-[#171717] text-[#ffffff]"
+                : "bg-[#f5f5f5] text-[#0a0a0a]"
             }`}
           >
             {opt}
@@ -77,8 +77,8 @@ function RadioGroup({
           onClick={() => onChange("__other__")}
           className={`flex h-[64px] cursor-pointer items-center rounded-[16px] px-[16px] font-body text-[16px] font-normal leading-[1.5] transition-colors ${
             other.enabled && value === "__other__"
-              ? "bg-[#a66c94] text-[#fcfcfc]"
-              : "bg-[#f1f0ed] text-[#282828]"
+              ? "bg-[#171717] text-[#ffffff]"
+              : "bg-[#f5f5f5] text-[#0a0a0a]"
           }`}
         >
           {other.enabled && value === "__other__" ? (
@@ -91,7 +91,7 @@ function RadioGroup({
               }}
               onClick={(e) => e.stopPropagation()}
               autoFocus
-              className="w-full bg-transparent font-body text-[16px] text-[#fcfcfc] outline-none placeholder:text-[#fcfcfc]/60"
+              className="w-full bg-transparent font-body text-[16px] text-[#ffffff] outline-none placeholder:text-[#ffffff]/60"
             />
           ) : (
             other.placeholder
@@ -121,8 +121,8 @@ function LikertScale({
             onClick={() => onChange(n)}
             className={`flex h-11 w-11 items-center justify-center rounded-lg font-body text-[16px] font-medium transition-colors ${
               value === n
-                ? "bg-[#a66c94] text-[#fcfcfc]"
-                : "bg-[#f1f0ed] text-[#282828]"
+                ? "bg-[#171717] text-[#ffffff]"
+                : "bg-[#f5f5f5] text-[#0a0a0a]"
             }`}
             aria-label={`${n} - ${LIKERT_LABELS[n - 1] || ""}`}
           >
@@ -184,12 +184,12 @@ export default function PreSurvey({ onComplete, roomId }: PreSurveyProps) {
   };
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-[#fcfcfc]">
+    <div className="flex min-h-[100dvh] flex-col bg-[#ffffff]">
       <div className="animate-fade-in flex flex-col gap-3 px-6 pt-20 text-center lg:mx-auto lg:max-w-[600px]">
         <h1 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
           Help Ash understand your relationship
         </h1>
-        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#4a4a4a]">
+        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#404040]">
           5 quick questions help Ash personalize your session. Your responses
           are anonymous and used for research only.
         </p>

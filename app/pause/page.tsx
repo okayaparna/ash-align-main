@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePostHog } from "posthog-js/react";
 
-const FONT_STYLE = { fontFamily: '"Libre Baskerville", serif', fontStyle: 'italic' as const };
+const FONT_STYLE = { fontFamily: 'var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif', letterSpacing: '-0.025em' };
 
 const INIT = "INIT";
 const SUBMITTING = "SUBMITTING";
@@ -21,7 +21,7 @@ const formStyles = {
   buttonText: "Join Waitlist",
   buttonFont: "Inter",
   buttonFontColor: "#ffffff",
-  buttonColor: "#5f3e28",
+  buttonColor: "#171717",
   buttonFontSizePx: 14,
   successMessage: "Thanks! We'll be in touch!",
   successFont: "Inter",
@@ -144,7 +144,7 @@ function LoopsSignUpForm() {
         </div>
         <button
           style={{
-            color: "#6b7280",
+            color: "#737373",
             font: "14px, Inter, sans-serif",
             margin: "10px auto",
             textAlign: "center",
@@ -187,7 +187,7 @@ function LoopsSignUpForm() {
           maxWidth: "300px",
           minWidth: "100px",
           background: "#FFFFFF",
-          border: "1px solid #D1D5DB",
+          border: "1px solid #e5e5e5",
           boxSizing: "border-box" as const,
           boxShadow: "rgba(0, 0, 0, 0.05) 0px 1px 2px",
           borderRadius: "6px",

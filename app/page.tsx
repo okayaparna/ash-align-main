@@ -11,21 +11,21 @@ type Step = "splash" | "info" | "setup" | "share";
 const CARDS = [
   {
     bg: "/card-wood-bg.svg",
-    accent: "#8e521f",
+    accent: "#171717",
     label: "First",
     title: "A private talk with Ash",
     body: "You and your partner each start alone. Ash asks about what has been sitting with you, in your own words. Neither of you sees the other's answers.",
   },
   {
     bg: "/card-olive-bg.svg",
-    accent: "#5f6b1f",
+    accent: "#171717",
     label: "Then",
     title: "You come together",
     body: "Ash brings you both into one conversation and holds the shape of it, making room for each of you to speak and be heard without it turning into a fight.",
   },
   {
     bg: "/card-damson-bg.svg",
-    accent: "#3f6152",
+    accent: "#171717",
     label: "Finally",
     title: "Something to take away",
     body: "When you are both ready to wrap up, Ash writes back what it heard: where you align, what is still tender, and a few concrete things to try.",
@@ -48,10 +48,10 @@ function BackButton({ onClick }: { onClick: () => void }) {
     <button
       onClick={onClick}
       aria-label="Go back"
-      className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f1f0ed]"
+      className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f5f5f5]"
     >
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12.5 15L7.5 10L12.5 5" stroke="#282828" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M12.5 15L7.5 10L12.5 5" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </button>
   );
@@ -156,7 +156,7 @@ function SplashScreen({ onBegin }: { onBegin: () => void }) {
               type="checkbox"
               checked={consentChecked}
               onChange={(e) => setConsentChecked(e.target.checked)}
-              className="mt-0.5 h-[17px] w-[17px] shrink-0 cursor-pointer rounded-[4px] border-[#4a4a4a] accent-[var(--contrast-strong)]"
+              className="mt-0.5 h-[17px] w-[17px] shrink-0 cursor-pointer rounded-[4px] border-[#404040] accent-[var(--contrast-strong)]"
             />
             <span className="font-body text-[12px] font-normal leading-[1.5] text-[var(--contrast-weak)]">
               I am 18 or older, and I agree to the{" "}
@@ -208,7 +208,7 @@ function InfoScreen({ onBack, onContinue }: { onBack: () => void; onContinue: ()
         <h1 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
           How this works
         </h1>
-        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#4a4a4a]">
+        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#404040]">
           Three parts, about thirty minutes. You can stop at any point.
         </p>
       </div>
@@ -305,13 +305,13 @@ function SetupScreen({
         <h1 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
           To begin with,
         </h1>
-        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#4a4a4a]">
+        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#404040]">
           What should Ash call you during the session?
         </p>
       </div>
 
       <div className="relative z-10 mx-auto mt-16 flex w-full max-w-[465px] flex-col gap-3 px-6">
-        <label className="font-body text-[12px] font-medium uppercase leading-[1.2] tracking-[1.25px] text-[#6b6b6b]">
+        <label className="font-body text-[12px] font-medium uppercase leading-[1.2] tracking-[1.25px] text-[#737373]">
           Your name
         </label>
         <input
@@ -320,7 +320,7 @@ function SetupScreen({
           onKeyDown={(e) => {
             if (e.key === "Enter" && canContinue) onContinue();
           }}
-          className="h-[64px] rounded-[16px] bg-[#f1f0ed] px-[24px] font-body text-[16px] text-[#282828] outline-none"
+          className="h-[64px] rounded-[16px] bg-[#f5f5f5] px-[24px] font-body text-[16px] text-[#0a0a0a] outline-none"
           placeholder="Enter your name"
           autoFocus
         />
@@ -360,17 +360,17 @@ function ShareScreen({
         <h1 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
           Your room is ready
         </h1>
-        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#4a4a4a]">
+        <p className="font-body text-[16px] font-normal leading-[1.5] text-[#404040]">
           Send this link to your partner. You will each talk to Ash on your own first, then meet in the middle.
         </p>
       </div>
 
       <div className="mx-auto mt-12 flex w-full max-w-[465px] flex-col gap-3 px-6">
-        <label className="font-body text-[12px] font-medium uppercase leading-[1.2] tracking-[1.25px] text-[#6b6b6b]">
+        <label className="font-body text-[12px] font-medium uppercase leading-[1.2] tracking-[1.25px] text-[#737373]">
           Room link
         </label>
-        <div className="flex items-center gap-3 rounded-[16px] bg-[#f1f0ed] px-[24px] py-[20px]">
-          <p className="min-w-0 flex-1 truncate font-body text-[14px] text-[#4a4a4a]">
+        <div className="flex items-center gap-3 rounded-[16px] bg-[#f5f5f5] px-[24px] py-[20px]">
+          <p className="min-w-0 flex-1 truncate font-body text-[14px] text-[#404040]">
             {roomUrl}
           </p>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -387,7 +387,7 @@ function ShareScreen({
         </button>
         <button
           onClick={onEnter}
-          className="flex h-[64px] w-full items-center justify-center gap-2 rounded-[16px] border border-[#f1f0ed] font-body text-[17px] font-medium leading-[1.2] tracking-[-0.011em] text-[var(--contrast-strong)]"
+          className="flex h-[64px] w-full items-center justify-center gap-2 rounded-[16px] border border-[#f5f5f5] font-body text-[17px] font-medium leading-[1.2] tracking-[-0.011em] text-[var(--contrast-strong)]"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/icon-door-open.svg" alt="" aria-hidden="true" className="h-5 w-5" />

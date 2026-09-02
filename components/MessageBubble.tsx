@@ -21,6 +21,9 @@ function splitParagraphs(text: string): string[] {
     .filter(Boolean);
 }
 
+const AUTHOR_LABEL =
+  "text-[11px] font-medium uppercase leading-[14px] tracking-[0.06em] text-muted-foreground";
+
 export default function MessageBubble({
   message,
   showAuthor,
@@ -37,112 +40,53 @@ export default function MessageBubble({
     ),
   };
 
-  // Assistant (Ash) messages — split into multiple bubbles
+  const md = (text: string) => (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm, remarkBreaks]}
+      components={mdComponents}
+    >
+      {text}
+    </ReactMarkdown>
+  );
+
+  // Ash — no bubble in any phase, just text blocks in the reading column
   if (isAssistant) {
     const paragraphs = splitParagraphs(message.text);
 
-    if (isCommons) {
-      return (
-        <div className="flex flex-col items-start gap-2 pl-4 pr-16">
-          {showAuthor && (
-            <p className="ml-4 text-xs font-medium uppercase leading-[1.2] tracking-[1.25px] text-[var(--damson-500)]">
-              Ash
-            </p>
-          )}
-          {paragraphs.map((para, i) => (
-            <div
-              key={`${message.id}-${i}`}
-              className="rounded-[var(--radius-md)] border border-[var(--hairline)] bg-[var(--surface-bg)] px-4 py-3.5"
-            >
-              <div className="font-display text-[17px] leading-[1.45] text-[var(--contrast-strong)]">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm, remarkBreaks]}
-                  components={mdComponents}
-                >
-                  {para}
-                </ReactMarkdown>
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    // Private room (intake) — no colored bubble, just text blocks
     return (
-      <div className="flex flex-col items-start gap-4 px-4">
+      <div className="flex flex-col items-start gap-3">
+        {isCommons && showAuthor && <p className={AUTHOR_LABEL}>Ash</p>}
         {paragraphs.map((para, i) => (
           <div
             key={`${message.id}-${i}`}
-            className="text-base leading-[1.5] text-[var(--contrast-strong)]"
+            className="msg-text text-foreground"
           >
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm, remarkBreaks]}
-              components={mdComponents}
-            >
-              {para}
-            </ReactMarkdown>
+            {md(para)}
           </div>
         ))}
       </div>
     );
   }
 
-  // Determine name color for commons: partner_a = apricot, partner_b = plum
-  const nameColor =
-    message.role === "partner_a"
-      ? "#8e521f"
-      : message.role === "partner_b"
-        ? "#a66c94"
-        : undefined;
-
-  // Current user's own messages — right-aligned, elevated bg
+  // Current participant — right-aligned bubble, tail on the bottom right
   if (isMine) {
     return (
-      <div className="flex flex-col items-end gap-2 pl-20 pr-4">
+      <div className="flex flex-col items-end gap-1.5">
         {isCommons && showAuthor && message.author_name && (
-          <p
-            className="mr-4 text-xs font-medium uppercase leading-[1.2] tracking-[1.25px]"
-            style={{ color: nameColor }}
-          >
-            {message.author_name}
-          </p>
+          <p className={AUTHOR_LABEL}>{message.author_name}</p>
         )}
-        <div className="rounded-[var(--radius-lg)] bg-[var(--surface-elevated)] px-4 py-3.5">
-          <div className="text-base leading-[1.5] text-[var(--contrast-strong)]">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm, remarkBreaks]}
-              components={mdComponents}
-            >
-              {message.text}
-            </ReactMarkdown>
-          </div>
-        </div>
+        <div className="msg-bubble msg-bubble-mine">{md(message.text)}</div>
       </div>
     );
   }
 
-  // Other participant's messages — left-aligned, elevated bg, with label
+  // Partner — same bubble, mirrored: left-aligned, tail on the bottom left
   return (
-    <div className="flex flex-col items-start gap-2 pl-4 pr-20">
+    <div className="flex flex-col items-start gap-1.5">
       {showAuthor && message.author_name && (
-        <p
-          className="ml-4 text-xs font-medium uppercase leading-[1.2] tracking-[1.25px]"
-          style={{ color: nameColor || "var(--contrast-subtle)" }}
-        >
-          {message.author_name}
-        </p>
+        <p className={AUTHOR_LABEL}>{message.author_name}</p>
       )}
-      <div className="rounded-[var(--radius-md)] bg-[var(--surface-elevated)] px-4 py-3.5">
-        <div className="text-base leading-[1.5] text-[var(--contrast-strong)]">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm, remarkBreaks]}
-            components={mdComponents}
-          >
-            {message.text}
-          </ReactMarkdown>
-        </div>
-      </div>
+      <div className="msg-bubble msg-bubble-theirs">{md(message.text)}</div>
     </div>
   );
 }

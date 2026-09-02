@@ -142,6 +142,23 @@ async function getVisibleMessages(
   return (data || []) as ChatMessage[];
 }
 
+// A participant's own intake transcript. Still readable once the room has moved
+// to commons — the "your room" tab in the header reads back through this.
+async function getIntakeMessages(
+  db: SupabaseClient,
+  roomId: string,
+  participantId: string,
+): Promise<ChatMessage[]> {
+  const { data } = await db
+    .from("messages")
+    .select("*")
+    .eq("room_id", roomId)
+    .eq("phase", "intake")
+    .eq("intake_participant_id", participantId)
+    .order("created_at", { ascending: true });
+  return (data || []) as ChatMessage[];
+}
+
 // Check if a participant can send a message
 function canSend(room: Room, participant: Participant, isConclusion: boolean): boolean {
   if (isConclusion) return false;
@@ -547,17 +564,23 @@ export async function endRoom(db: SupabaseClient, participantId: string): Promis
 export async function pollRoom(
   db: SupabaseClient,
   participantId: string,
-): Promise<{ state: RoomState; messages: ChatMessage[] }> {
+): Promise<{ state: RoomState; messages: ChatMessage[]; intakeMessages: ChatMessage[] }> {
   const participant = await getParticipant(db, participantId);
   const room = await getRoom(db, participant.room_id);
   const participants = await getParticipants(db, room.id);
   const allMessages = await getVisibleMessages(db, room.id, room, participantId);
 
+  // In intake, `messages` already is the intake transcript — no second query needed.
+  const intakeMessages =
+    room.phase === "commons"
+      ? await getIntakeMessages(db, room.id, participantId)
+      : allMessages;
+
   // If the room was ended early (e.g. safety concern during intake)
   if (room.completed_at && room.phase === "intake") {
     const state = buildRoomState(room, participant, participants, false, null);
     state.phase = "ended";
-    return { state, messages: [] };
+    return { state, messages: [], intakeMessages };
   }
 
   // Detect conclusion state from marker message
@@ -572,5 +595,5 @@ export async function pollRoom(
 
   const state = buildRoomState(room, participant, participants, isConclusion, conclusionSummary, handsRaised);
 
-  return { state, messages };
+  return { state, messages, intakeMessages };
 }

@@ -1,104 +1,442 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-/* Google Sans — local files */
-@font-face {
-  font-family: "Google Sans";
-  src: url("/fonts/google-sans/GoogleSans-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Google Sans";
-  src: url("/fonts/google-sans/GoogleSans-Italic.ttf") format("truetype");
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Google Sans";
-  src: url("/fonts/google-sans/GoogleSans-Medium.ttf") format("truetype");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Google Sans";
-  src: url("/fonts/google-sans/GoogleSans-SemiBold.ttf") format("truetype");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Google Sans";
-  src: url("/fonts/google-sans/GoogleSans-Bold.ttf") format("truetype");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
+@custom-variant dark (&:is(.dark *));
 
-/* PP Fragment Glare — display font */
-@font-face {
-  font-family: "PP Fragment Glare";
-  src: url("/fonts/pp-fragment/PPFragment-GlareMedium.ttf") format("truetype");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* DM Sans — variable font */
-@font-face {
-  font-family: "DM Sans";
-  src: url("/fonts/dm-sans/DMSans-VariableFont_opsz,wght.ttf") format("truetype");
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
+/* ============================================================
+   shadcn/ui — base color: neutral
+   ============================================================ */
 
 :root {
-  /* Ground + ink — Ando-derived near-white / graphite */
-  --surface-bg: #fcfcfc;
-  --surface-elevated: #f1f0ed;
-  --surface-high: #e7e4dd;
-  --hairline: rgba(0, 0, 0, 0.1);
-  --hairline-strong: rgba(0, 0, 0, 0.18);
+  --radius: 0.625rem;
 
-  --contrast-strong: #282828;
-  --contrast-medium: #4a4a4a;
-  --contrast-weak: #6b6b6b;
-  --contrast-subtle: #8a8a8a;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
 
-  /* Phase accents — retained as semantic signal only (labels, ready states,
-     phase cues). Grounds and bubbles are neutral; these no longer fill areas. */
-  --wood-50: #faf6f3;
-  --wood-200: #e9d7cb;
-  --wood-500: #a56b45;
-  --wood-600: #8a5a3a;
-  --wood-700: #5f3e28;
-  --wood-800: #352317;
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
 
-  --olive-50: #f6f7ef;
-  --olive-200: #d9ddb6;
-  --olive-600: #5f652f;
-  --olive-700: #444822;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
 
-  --damson-200: #d1ddd7;
-  --damson-500: #5d7f6e;
-  --damson-600: #4a6355;
-  --damson-700: #374940;
-  --damson-800: #1f2924;
+  /* Chat surface. Type scale drives every piece of chat text at once. */
+  --bubble: #f0f0f0;
+  --msg-size: 16px;
+  --msg-leading: 24px;
+  --ui-size: 14px;
+  --ui-leading: 20px;
 
-  --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
+  /* Participant identity + controls (Figma 81-1431).
+     These sit deliberately outside the shadcn neutral scale — the design
+     reintroduces colour to tell the two participants apart. */
+  --chip-self: #fce4ec;
+  --chip-partner: #f0eaf4;
+  --chip-foreground: #2e2a2b;
+  --switch-track: #d9d9d9;
+  --switch-thumb: #ffffff;
+  --switch-inactive: #8a8a8a;
+  --action: #2e2a2b;
+  --action-foreground: #ffffff;
+  --action-disabled: #ededed;
+  --action-disabled-foreground: #bcbcbc;
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+
+  --bubble: oklch(0.269 0 0);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-bubble: var(--bubble);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* These live in @layer components so Tailwind utilities — `hidden`,
+   `lg:inline-flex`, spacing overrides — still win over them. Unlayered
+   rules beat every utility and silently break responsive variants. */
+@layer components {
+  /* ============================================================
+     Chat text UI — geometry from Figma 81-1431 (Material 3 kit).
+     Bump --msg-size / --msg-leading to rescale all chat text at once.
+     ============================================================ */
+
+  .msg-text {
+    font-size: var(--msg-size);
+    line-height: var(--msg-leading);
+    letter-spacing: 0;
+  }
+
+  .msg-bubble {
+    max-width: 72%;
+    width: fit-content;
+    border-radius: 20px;
+    background: var(--bubble);
+    color: var(--chip-foreground);
+    padding: 16px 20px;
+    font-size: var(--msg-size);
+    line-height: var(--msg-leading);
+    letter-spacing: 0;
+  }
+
+  /* Tail corner points at the speaker */
+  .msg-bubble-mine { border-bottom-right-radius: 8px; }
+  .msg-bubble-theirs { border-bottom-left-radius: 8px; }
+
+  /* ---------- Header controls ---------- */
+
+  .ui-text {
+    font-size: var(--ui-size);
+    line-height: var(--ui-leading);
+    letter-spacing: 0;
+  }
+
+  /* Participant chip — colour-coded so the two people are told apart at a glance */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    min-width: 0;
+    max-width: 100%;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-size: var(--ui-size);
+    line-height: var(--ui-leading);
+    font-weight: 500;
+    color: var(--chip-foreground);
+    white-space: nowrap;
+    transition: background-color 160ms ease, color 160ms ease;
+  }
+  .chip > svg { flex: none; }
+  .chip-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* Below lg the chips collapse to overlapping circles carrying the initial,
+     which is what the mobile design shows. */
+  .chip-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border-radius: 999px;
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--chip-foreground);
+  }
+
+  .chip-self { background: var(--chip-self); }
+  .chip-partner { background: var(--chip-partner); }
+  .chip[data-absent="true"] { opacity: 0.5; }
+
+  /* Phase switcher — segmented control with a sliding thumb */
+  .phase-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    padding: 4px;
+    border-radius: 999px;
+    background: var(--switch-track);
+  }
+  .phase-switch-thumb {
+    position: absolute;
+    /* Without an explicit left the box takes its *static* position, which is
+       already inset by the track's 4px padding — the translateX then double-counts
+       it and the thumb overhangs the track on the last segment. */
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    border-radius: 999px;
+    background: var(--switch-thumb);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.1);
+    /* The reference's easing — slides between segments rather than cutting */
+    transition:
+      transform 280ms cubic-bezier(0.23, 1, 0.32, 1),
+      width 280ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .phase-switch-item {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    min-width: 0;
+    padding: 0 20px;
+    border-radius: 999px;
+    font-size: var(--ui-size);
+    line-height: var(--ui-leading);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--switch-inactive);
+    transition: color 180ms ease;
+  }
+
+  @media (max-width: 767px) {
+    .phase-switch-item {
+      padding: 0 10px;
+      font-size: 13px;
+    }
+  }
+  .phase-switch-item[data-active="true"] {
+    color: var(--chip-foreground);
+    font-weight: 600;
+  }
+  .phase-switch-item:disabled { cursor: default; }
+
+  /* Filled action button (I'm Ready / End Session) */
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 22px;
+    border-radius: 999px;
+    background: var(--action);
+    color: var(--action-foreground);
+    font-size: var(--ui-size);
+    line-height: var(--ui-leading);
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background-color 160ms ease, color 160ms ease, opacity 160ms ease;
+  }
+  @media (max-width: 767px) {
+    .action-btn {
+      width: 44px;
+      padding: 0;
+    }
+  }
+
+  .action-btn:hover:not(:disabled) { opacity: 0.88; }
+  .action-btn:disabled {
+    background: var(--action-disabled);
+    color: var(--action-disabled-foreground);
+  }
+
+  /* Icon button (copy link) */
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    width: 40px;
+    border-radius: 999px;
+    color: var(--switch-inactive);
+    transition: color 160ms ease, background-color 160ms ease;
+  }
+  .icon-btn:hover { color: var(--chip-foreground); background: var(--muted); }
+
+  /* Tooltip — spec lifted from iamnoman.com/shop */
+  .ui-tooltip {
+    pointer-events: none;
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    margin-top: 8px;
+    z-index: 50;
+    border-radius: 8px;
+    background: #242529;
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 11px;
+    line-height: 14px;
+    font-weight: 500;
+    letter-spacing: 0;
+    white-space: nowrap;
+    box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.28);
+    opacity: 0;
+    transform: translateX(-50%) scale(0.97) translateY(-2px);
+    transform-origin: center top;
+    transition:
+      opacity 150ms cubic-bezier(0.23, 1, 0.32, 1),
+      transform 150ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .ui-tooltip[data-open="true"] {
+    opacity: 1;
+    transform: translateX(-50%) scale(1) translateY(0);
+  }
+
+  /* Controls that sit against a viewport edge anchor their tooltip to that edge
+     instead of centring it, so it can't be clipped. */
+  .ui-tooltip[data-align="start"] {
+    left: 0;
+    transform: scale(0.97) translateY(-2px);
+    transform-origin: left top;
+  }
+  .ui-tooltip[data-align="start"][data-open="true"] {
+    transform: scale(1) translateY(0);
+  }
+  .ui-tooltip[data-align="end"] {
+    left: auto;
+    right: 0;
+    transform: scale(0.97) translateY(-2px);
+    transform-origin: right top;
+  }
+  .ui-tooltip[data-align="end"][data-open="true"] {
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ============================================================
+   Ash Align — legacy token aliases
+   Every one of these now resolves onto the neutral scale above.
+   Existing components keep working; the palette is grayscale.
+   ============================================================ */
+
+:root {
+  /* Ground + ink */
+  --surface-bg: var(--background);
+  --surface-elevated: var(--muted);
+  --surface-high: oklch(0.94 0 0);
+  --hairline: var(--border);
+  --hairline-strong: oklch(0.85 0 0);
+
+  --contrast-strong: var(--foreground);
+  --contrast-medium: oklch(0.371 0 0);
+  --contrast-weak: var(--muted-foreground);
+  --contrast-subtle: oklch(0.708 0 0);
+  --ink-soft: var(--muted-foreground);
+
+  /* Former phase accents (wood / olive / damson) — now neutral steps */
+  --wood-50: oklch(0.97 0 0);
+  --wood-200: oklch(0.922 0 0);
+  --wood-300: oklch(0.87 0 0);
+  --wood-500: oklch(0.556 0 0);
+  --wood-600: oklch(0.439 0 0);
+  --wood-700: oklch(0.205 0 0);
+  --wood-800: oklch(0.145 0 0);
+
+  --olive-50: oklch(0.97 0 0);
+  --olive-200: oklch(0.922 0 0);
+  --olive-600: oklch(0.439 0 0);
+  --olive-700: oklch(0.205 0 0);
+
+  --damson-200: oklch(0.922 0 0);
+  --damson-300: oklch(0.87 0 0);
+  --damson-400: oklch(0.708 0 0);
+  --damson-500: oklch(0.556 0 0);
+  --damson-600: oklch(0.439 0 0);
+  --damson-700: oklch(0.205 0 0);
+  --damson-800: oklch(0.145 0 0);
+
   --radius-pill: 999px;
 }
 
 body {
   margin: 0;
-  background: var(--surface-bg);
-  color: var(--contrast-strong);
-  font-family: "Google Sans", sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -107,15 +445,17 @@ button {
   cursor: pointer;
 }
 
+/* Display type. Reset to Geist tight-tracked, matching the reference site.
+   To bring the serif back, restore the Instrument Serif stack on this rule. */
 .font-display {
-  font-family: "Instrument Serif", "Libre Baskerville", Georgia, serif;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.025em;
 }
 
-/* Sub-headers: sans, larger + bolder (not serif) */
+/* Sub-headers */
 .ui-subhead {
-  font-family: "Google Sans", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   font-size: 19px;
   font-weight: 600;
   line-height: 26px;
@@ -139,7 +479,7 @@ button {
   transition: background 160ms ease, border-color 160ms ease;
 }
 .ui-pill:hover:not(:disabled) {
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--muted);
   border-color: var(--hairline-strong);
 }
 .ui-pill:disabled { opacity: 0.4; }
@@ -152,8 +492,8 @@ button {
   gap: 10px;
   border: 1px solid transparent;
   border-radius: 999px;
-  background: var(--contrast-strong);
-  color: var(--surface-bg);
+  background: var(--primary);
+  color: var(--primary-foreground);
   font-family: inherit;
   font-size: 16px;
   padding: 11px 21px;
@@ -165,7 +505,7 @@ button {
 /* Circular arrow badge used inside pills */
 .ui-arrow {
   width: 28px; height: 28px; border-radius: 999px;
-  background: var(--contrast-strong); color: var(--surface-bg);
+  background: var(--primary); color: var(--primary-foreground);
   display: grid; place-items: center; flex: none;
 }
 
@@ -185,7 +525,6 @@ button {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
 
 /* ---------- Landing hero (splash) ---------- */
 .splash-bub {
@@ -207,9 +546,9 @@ button {
   font-size: 11px; color: var(--contrast-weak);
 }
 .splash-av.ash {
-  background: var(--contrast-strong);
-  color: var(--surface-bg);
-  border-color: var(--contrast-strong);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
 }
 .splash-msg {
   background: var(--surface-elevated);
@@ -221,9 +560,8 @@ button {
   white-space: nowrap;
 }
 .splash-msg.ash {
-  background: var(--surface-bg);
-  font-family: "Instrument Serif", Georgia, serif;
-  font-size: 16px;
+  background: var(--background);
+  font-size: 15px;
 }
 @keyframes splash-rise {
   from { opacity: 0; transform: translateY(10px); }
@@ -237,9 +575,11 @@ button {
 /* Drop cap on the opening paragraph */
 .splash-lead::first-letter {
   float: left;
-  font-family: "Instrument Serif", Georgia, serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
   font-size: 60px;
   line-height: 46px;
+  letter-spacing: -0.03em;
   padding: 6px 10px 0 0;
   color: var(--contrast-strong);
 }

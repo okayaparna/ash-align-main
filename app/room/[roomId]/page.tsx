@@ -5,17 +5,21 @@ import { useSearchParams } from "next/navigation";
 
 import { useAutoScroll } from "@/hooks/useAutoScroll";
 import { useSession } from "@/hooks/useSession";
-import type { ChatMessage, RoomPhase, RoomState } from "@/lib/types";
+import type { ChatMessage, RoomState } from "@/lib/types";
 
 import ChatInput from "@/components/ChatInput";
 import FinishedScreen from "@/components/FinishedScreen";
 import MessageList from "@/components/MessageList";
+import ParticipantChip from "@/components/ParticipantChip";
+import PhaseSwitch, { type PhaseView } from "@/components/PhaseSwitch";
+import Tooltip from "@/components/Tooltip";
+import { CheckIcon, HourglassIcon, LinkIcon } from "@/components/icons/MaterialIcons";
 import SurveyScreen from "@/components/SurveyScreen";
 import { PRE_SURVEY_ID, PRE_SURVEY_QUESTIONS, PRE_SURVEY_QUESTIONS_B, isSurveyTestVariant } from "@/lib/surveys";
 
 type ViewState = "splash" | "name" | "survey-intro" | "survey" | "joining" | "chat" | "error";
 
-const FONT_STYLE = { fontFamily: '"Libre Baskerville", serif', fontStyle: 'italic' as const };
+const FONT_STYLE = { fontFamily: 'var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif', letterSpacing: '-0.025em' };
 
 function SplashScreen({ onBegin }: { onBegin: () => void }) {
   const [showAlign, setShowAlign] = useState(false);
@@ -111,7 +115,7 @@ function SplashScreen({ onBegin }: { onBegin: () => void }) {
             type="checkbox"
             checked={consentChecked}
             onChange={(e) => setConsentChecked(e.target.checked)}
-            className="mt-0.5 h-[17px] w-[17px] shrink-0 cursor-pointer rounded-[4px] border-[#4a4a4a] accent-[#8e521f]"
+            className="mt-0.5 h-[17px] w-[17px] shrink-0 cursor-pointer rounded-[4px] border-[#404040] accent-[#171717]"
           />
           <span className="font-body text-[12px] font-normal leading-[1.5] text-[var(--contrast-weak)]">
             I am 18 or older, and I agree to the{" "}
@@ -138,44 +142,36 @@ function SplashScreen({ onBegin }: { onBegin: () => void }) {
   );
 }
 
-// --- Icons ---
-function ChatCenteredDotsIcon({ color = "var(--contrast-subtle)" }: { color?: string }) {
+// --- Full-screen transition ---
+function TransitionScreen({
+  title,
+  subtitle,
+  titleKey,
+}: {
+  title: string;
+  subtitle?: string;
+  /** Change to re-run the fade when the copy rotates */
+  titleKey?: string | number;
+}) {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="7.5" r="0.625" fill={color} />
-      <circle cx="5.25" cy="7.5" r="0.625" fill={color} />
-      <circle cx="10.75" cy="7.5" r="0.625" fill={color} />
-      <path d="M6.567 12L7.567 13.75C7.654 13.902 7.82 14 8 14C8.18 14 8.346 13.902 8.436 13.75L9.436 12H13.5C13.776 12 14 11.776 14 11.5V3.5C14 3.224 13.776 3 13.5 3H2.5C2.224 3 2 3.224 2 3.5V11.5C2 11.776 2.224 12 2.5 12H6.567Z" stroke={color} strokeWidth="0.75" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function CheckCircleIcon({ color = "var(--olive-600)" }: { color?: string }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="8" r="7" stroke={color} strokeWidth="1.5" />
-      <path d="M5 8L7 10L11 6" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function WifiSlashIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <path d="M2 14L14 2" stroke="var(--contrast-weak)" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M4 10C5.1 8.9 6.5 8.3 8 8.3" stroke="var(--contrast-weak)" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M2 7.5C3.7 5.8 5.8 4.8 8 4.8S12.3 5.8 14 7.5" stroke="var(--contrast-weak)" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="8" cy="12" r="1" fill="var(--contrast-weak)" />
-    </svg>
-  );
-}
-
-function LinkIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <path d="M11.045 5.053L11.905 4.194C12.602 3.497 13.533 3.127 14.48 3.127C15.428 3.127 16.359 3.497 17.056 4.194C17.753 4.891 18.123 5.822 18.123 6.77C18.123 7.717 17.753 8.648 17.056 9.345L14.344 12.058C13.647 12.755 12.716 13.125 11.765 13.125C10.813 13.125 9.882 12.755 9.187 12.054C8.838 11.704 8.563 11.286 8.38 10.827C8.197 10.367 8.11 9.874 8.125 9.38" stroke="var(--contrast-weak)" strokeWidth="0.94" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M8.955 14.947L8.095 15.806C7.398 16.503 6.467 16.873 5.517 16.873C4.566 16.873 3.635 16.503 2.939 15.802C2.258 15.119 1.876 14.193 1.877 13.228C1.878 12.262 2.261 11.337 2.944 10.655L5.656 7.942C6.353 7.245 7.284 6.875 8.232 6.875C9.18 6.875 10.111 7.245 10.808 7.942C11.159 8.292 11.435 8.71 11.619 9.171C11.802 9.631 11.89 10.125 11.875 10.62" stroke="var(--contrast-weak)" strokeWidth="0.94" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <div className="relative flex h-[100dvh] flex-col items-center justify-center overflow-hidden bg-background px-6">
+      <div className="animate-fade-in relative z-10 flex flex-col items-center gap-6 text-center">
+        <div className="flex items-center gap-2">
+          <span className="h-2.5 w-2.5 animate-bounce rounded-full bg-[var(--switch-inactive)] [animation-delay:0ms]" />
+          <span className="h-2.5 w-2.5 animate-bounce rounded-full bg-[var(--switch-inactive)] [animation-delay:120ms]" />
+          <span className="h-2.5 w-2.5 animate-bounce rounded-full bg-[var(--switch-inactive)] [animation-delay:240ms]" />
+        </div>
+        <h2
+          key={titleKey}
+          className="font-display animate-fade-in max-w-[320px] text-[22px] leading-[1.25] text-[var(--chip-foreground)]"
+        >
+          {title}
+        </h2>
+        {subtitle ? (
+          <p className="msg-text max-w-[320px] text-[var(--switch-inactive)]">{subtitle}</p>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
@@ -183,54 +179,9 @@ function LinkIcon() {
 function Toast({ message, visible }: { message: string; visible: boolean }) {
   return (
     <div
-      className={`pointer-events-none fixed left-1/2 top-[128px] z-50 -translate-x-1/2 rounded-[var(--radius-pill)] bg-[var(--wood-600)] px-4 py-2.5 text-sm font-semibold tracking-[-0.25px] text-[var(--wood-50)] transition-all duration-300 ${visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"}`}
+      className={`ui-text pointer-events-none fixed left-1/2 top-[104px] z-50 -translate-x-1/2 rounded-full bg-[var(--action)] px-4 py-2 font-medium text-[var(--action-foreground)] transition-all duration-300 ${visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"}`}
     >
       {message}
-    </div>
-  );
-}
-
-// --- Participant Status ---
-function ParticipantStatus({
-  name,
-  ready,
-  connected,
-  phase,
-  wrapUp,
-}: {
-  name: string;
-  ready: boolean;
-  connected: boolean;
-  phase: RoomPhase;
-  wrapUp?: boolean;
-}) {
-  // Determine icon and name color based on phase
-  let icon: React.ReactNode;
-  let nameColor = "text-[var(--contrast-subtle)]";
-
-  if (phase === "commons") {
-    if (wrapUp) {
-      icon = <CheckCircleIcon color="var(--damson-600)" />;
-      nameColor = "text-[var(--damson-600)]";
-    } else {
-      icon = <ChatCenteredDotsIcon />;
-    }
-  } else {
-    // intake phase
-    if (ready) {
-      icon = <CheckCircleIcon color="var(--wood-500)" />;
-      nameColor = "text-[var(--wood-500)]";
-    } else if (!connected) {
-      icon = <WifiSlashIcon />;
-    } else {
-      icon = <ChatCenteredDotsIcon />;
-    }
-  }
-
-  return (
-    <div className="flex items-center gap-0.5">
-      {icon}
-      <span className={`text-xs ${nameColor}`}>{name}</span>
     </div>
   );
 }
@@ -239,6 +190,8 @@ function ParticipantStatus({
 function TopBar({
   roomState,
   messages,
+  tab,
+  onTabChange,
   onReady,
   readyLoading,
   onWrapUp,
@@ -248,6 +201,8 @@ function TopBar({
 }: {
   roomState: RoomState;
   messages: ChatMessage[];
+  tab: PhaseView;
+  onTabChange: (v: PhaseView) => void;
   onReady: () => void;
   readyLoading: boolean;
   onWrapUp: () => void;
@@ -261,129 +216,163 @@ function TopBar({
   useEffect(() => {
     const el = headerRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => {
-      setHeaderHeight(el.getBoundingClientRect().height);
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
+    const update = () => setHeaderHeight(el.getBoundingClientRect().height);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
-  const myReady =
-    roomState.participantRole === "partner_a"
-      ? roomState.partnerAReady
-      : roomState.partnerBReady;
 
-  const partnerName =
-    roomState.participantRole === "partner_a"
-      ? roomState.partnerBName
-      : roomState.partnerAName;
-  const partnerReady =
-    roomState.participantRole === "partner_a"
-      ? roomState.partnerBReady
-      : roomState.partnerAReady;
+  const isPartnerA = roomState.participantRole === "partner_a";
+  const partnerName = isPartnerA ? roomState.partnerBName : roomState.partnerAName;
+  const myReady = isPartnerA ? roomState.partnerAReady : roomState.partnerBReady;
+  const partnerReady = isPartnerA ? roomState.partnerBReady : roomState.partnerAReady;
+  const myWrapUp = isPartnerA ? roomState.partnerAWrapUp : roomState.partnerBWrapUp;
+  const partnerWrapUp = isPartnerA ? roomState.partnerBWrapUp : roomState.partnerAWrapUp;
 
-  const myWrapUp =
-    roomState.participantRole === "partner_a"
-      ? roomState.partnerAWrapUp
-      : roomState.partnerBWrapUp;
+  const inCommons = roomState.phase === "commons" || roomState.phase === "conclusion";
 
-  const partnerWrapUp =
-    roomState.participantRole === "partner_a"
-      ? roomState.partnerBWrapUp
-      : roomState.partnerAWrapUp;
+  // Chip icon means "done with the current step": ready in intake, wrapped up in commons
+  const myDone = inCommons ? myWrapUp : myReady;
+  const partnerDone = inCommons ? partnerWrapUp : partnerReady;
 
-  // Detect if Ash has flagged a safety concern (mentions the DV hotline)
   const safetyFlagged = messages.some(
     (m) => m.role === "assistant" && m.text.includes("1-800-799-7233")
   );
 
-  const roomName =
-    roomState.phase === "commons"
-      ? "The Commons"
-      : `${roomState.participantName}'s private room`;
+  const segments = [
+    {
+      id: "room" as PhaseView,
+      label: `${roomState.participantName}'s room`,
+    },
+    {
+      id: "commons" as PhaseView,
+      label: "The commons",
+    },
+  ];
 
   return (
     <>
-      <header ref={headerRef} className="fixed top-0 left-0 right-0 z-20 flex items-center justify-between border-b-2 border-[var(--surface-elevated)] bg-[var(--surface-bg)] px-4 pb-3 pt-14 lg:pt-4">
-        <div className="flex flex-col gap-1">
-          <button
-            type="button"
-            onClick={onCopyLink}
-            className="flex items-center gap-1"
-          >
-            <h1 className="text-lg font-semibold leading-[1.2] tracking-[-0.1px] text-[var(--contrast-medium)]">
-              {roomName}
-            </h1>
-            <LinkIcon />
-          </button>
-          <div className="flex items-center gap-3">
-            <ParticipantStatus
-              name={roomState.participantName}
-              ready={myReady}
-              connected={true}
-              phase={roomState.phase}
-              wrapUp={myWrapUp}
+      <header
+        ref={headerRef}
+        className="fixed top-0 right-0 left-0 z-20 flex items-center justify-between gap-1.5 bg-background px-3 pb-3 pt-[max(12px,env(safe-area-inset-top))] md:gap-3 md:px-6 md:pt-6"
+      >
+        {/* Left — who is in the room, colour-coded */}
+        <div className="flex shrink-0 items-center lg:gap-3">
+          <ParticipantChip
+            name={roomState.participantName}
+            self
+            align="start"
+            className="relative z-10"
+            done={myDone}
+            tooltip={
+              inCommons
+                ? myDone
+                  ? "You're ready to wrap up"
+                  : "You — still talking"
+                : myDone
+                  ? "You're ready for the commons"
+                  : "You — still in your private room"
+            }
+          />
+          {partnerName ? (
+            <ParticipantChip
+              name={partnerName}
+              self={false}
+              align="start"
+              className="-ml-3 lg:ml-0"
+              done={partnerDone}
+              connected={roomState.partnerConnected}
+              tooltip={
+                inCommons
+                  ? partnerDone
+                    ? `${partnerName} is ready to wrap up`
+                    : `${partnerName} is still talking`
+                  : partnerDone
+                    ? `${partnerName} is ready for the commons`
+                    : `${partnerName} is still in their private room`
+              }
             />
-            {partnerName ? (
-              <ParticipantStatus
-                name={partnerName}
-                ready={partnerReady}
-                connected={roomState.partnerConnected}
-                phase={roomState.phase}
-                wrapUp={partnerWrapUp}
-              />
-            ) : null}
-          </div>
+          ) : null}
         </div>
-        {roomState.phase === "intake" && !myReady && !safetyFlagged ? (
-          <button
-            onClick={onReady}
-            disabled={readyLoading}
-            className="flex items-center gap-2 rounded-[var(--radius-pill)] bg-[var(--surface-elevated)] px-4 py-2.5 text-sm font-semibold leading-[1.2] tracking-[-0.25px] text-[var(--wood-700)] disabled:opacity-60"
-          >
-            {readyLoading ? (
-              <>
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--wood-300)] border-t-[var(--wood-700)]" />
-                Preparing...
-              </>
-            ) : (
-              "I'm Ready"
-            )}
-          </button>
-        ) : null}
-        {roomState.phase === "intake" && safetyFlagged ? (
-          <button
-            onClick={onEndSession}
-            className="flex items-center gap-2 rounded-[var(--radius-pill)] bg-[#c0392b]/10 px-4 py-2.5 text-sm font-semibold leading-[1.2] tracking-[-0.25px] text-[#c0392b]"
-          >
-            End Session
-          </button>
-        ) : null}
-        {roomState.phase === "intake" && myReady ? (
-          <div className="rounded-[var(--radius-pill)] bg-[var(--wood-600)] px-4 py-2.5 text-sm font-semibold leading-[1.2] tracking-[-0.25px] text-[var(--wood-50)]">
-            I&apos;m Ready
-          </div>
-        ) : null}
-        {roomState.phase === "commons" && !myWrapUp ? (
-          <button
-            onClick={onWrapUp}
-            disabled={wrapUpLoading}
-            className="flex items-center gap-2 rounded-[var(--radius-pill)] bg-[var(--surface-elevated)] px-4 py-2.5 text-sm font-semibold leading-[1.2] tracking-[-0.25px] text-[var(--damson-700)] disabled:opacity-60"
-          >
-            {wrapUpLoading ? (
-              <>
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--damson-200)] border-t-[var(--damson-700)]" />
-                Wrapping up...
-              </>
-            ) : (
-              "Wrap Up"
-            )}
-          </button>
-        ) : null}
-        {roomState.phase === "commons" && myWrapUp ? (
-          <div className="rounded-[var(--radius-pill)] bg-[var(--damson-600)] px-4 py-2.5 text-sm font-semibold leading-[1.2] tracking-[-0.25px] text-[var(--wood-50)]">
-            Wrap Up
-          </div>
-        ) : null}
+
+        {/* Centre — move between your private room and the commons */}
+        <div className="flex min-w-0 flex-1 items-center justify-center gap-2">
+          <PhaseSwitch segments={segments} value={tab} onChange={onTabChange} />
+          <span className="hidden md:contents">
+            <Tooltip label="Copy invite link">
+              <button
+                type="button"
+                onClick={onCopyLink}
+                aria-label="Copy invite link"
+                className="icon-btn"
+              >
+                <LinkIcon size={20} />
+              </button>
+            </Tooltip>
+          </span>
+        </div>
+
+        {/* Right — the one action available in this phase */}
+        <div className="flex shrink-0 items-center justify-end">
+          {!inCommons && safetyFlagged ? (
+            <Tooltip label="End this session now" align="end">
+              <button onClick={onEndSession} className="action-btn">
+                End Session
+              </button>
+            </Tooltip>
+          ) : !inCommons ? (
+            <Tooltip
+              align="end"
+              label={myReady ? "Waiting for your partner" : "Finish here and move to the commons"}
+            >
+              <button
+                onClick={onReady}
+                disabled={readyLoading || myReady}
+                className="action-btn"
+              >
+                {readyLoading ? (
+                  <>
+                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                    Preparing...
+                  </>
+                ) : (
+                  <>
+                    <span className="hidden md:inline">I&apos;m Ready</span>
+                    <CheckIcon size={22} className="md:hidden" />
+                  </>
+                )}
+              </button>
+            </Tooltip>
+          ) : (
+            <Tooltip
+              align="end"
+              label={
+                myWrapUp
+                  ? "Waiting for your partner to wrap up"
+                  : "Wrap up and get your conclusion"
+              }
+            >
+              <button
+                onClick={onWrapUp}
+                disabled={wrapUpLoading || myWrapUp}
+                className="action-btn"
+              >
+                {wrapUpLoading ? (
+                  <>
+                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                    Wrapping up...
+                  </>
+                ) : (
+                  <>
+                    <span className="hidden md:inline">Wrap Up</span>
+                    <CheckIcon size={22} className="md:hidden" />
+                  </>
+                )}
+              </button>
+            </Tooltip>
+          )}
+        </div>
       </header>
       {/* Spacer to offset fixed header */}
       <div style={{ height: headerHeight }} className="shrink-0" />
@@ -399,17 +388,9 @@ function HandRaiseIcon({ color = "currentColor" }: { color?: string }) {
   );
 }
 
-function StatusBottomBar({ message }: { message: string }) {
+function WrapUpIcon({ color = "#a1a1a1" }: { color?: string }) {
   return (
-    <div className="border-t border-[var(--surface-elevated)] bg-[var(--surface-bg)] px-10 pb-12 pt-6 text-center lg:pb-6">
-      <p className="text-base leading-[1.5] text-[var(--contrast-weak)]">{message}</p>
-    </div>
-  );
-}
-
-function WrapUpIcon({ color = "#8a8a8a" }: { color?: string }) {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="shrink-0">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="mt-px shrink-0">
       <path d="M17.323 18.356l-.54-.54a.52.52 0 00-.422-.177.52.52 0 00-.422.177.52.52 0 00-.177.414c0 .158.059.297.177.415l.917.917a.57.57 0 00.472.206.57.57 0 00.472-.206l2.262-2.221a.52.52 0 00.181-.417.54.54 0 00-.181-.428.54.54 0 00-.427-.177.54.54 0 00-.427.177l-1.885 1.86zM7.135 8.865h9.73a.72.72 0 00.535-.215.72.72 0 00.215-.535.72.72 0 00-.215-.54.72.72 0 00-.535-.21h-9.73a.72.72 0 00-.535.215.72.72 0 00-.215.535c0 .213.071.391.215.535a.72.72 0 00.535.215zM18 22.558a4.53 4.53 0 01-3.187-1.314 4.53 4.53 0 01-1.313-3.186c0-1.249.438-2.311 1.313-3.187A4.53 4.53 0 0118 13.558c1.249 0 2.311.438 3.187 1.313a4.53 4.53 0 011.313 3.187 4.53 4.53 0 01-1.313 3.186A4.53 4.53 0 0118 22.558zM3.5 5.308c0-.499.177-.925.53-1.278A1.74 1.74 0 015.308 3.5h13.384c.499 0 .925.177 1.278.53.353.353.53.779.53 1.278v5.346a.72.72 0 01-.216.535.72.72 0 01-.534.215.72.72 0 01-.535-.215.72.72 0 01-.215-.535V5.308a.3.3 0 00-.096-.212.3.3 0 00-.212-.096H5.308a.3.3 0 00-.212.096.3.3 0 00-.096.212V19.05h6.21c.027.192.064.385.112.577.047.192.103.379.167.562.064.151.032.273-.095.365-.127.093-.248.088-.362-.013l-.162-.123a.47.47 0 00-.292-.112.47.47 0 00-.292.112l-.839.704a.42.42 0 01-.292.112.42.42 0 01-.293-.112l-.838-.704a.47.47 0 00-.293-.112.47.47 0 00-.292.112l-.839.704a.42.42 0 01-.292.112.42.42 0 01-.293-.112l-.838-.704a.47.47 0 00-.293-.112.47.47 0 00-.292.112L3.5 21.394V5.308zM7.135 16.635h3.625a.72.72 0 00.534-.215.72.72 0 00.216-.535.72.72 0 00-.216-.535.72.72 0 00-.534-.215H7.135a.72.72 0 00-.535.216.72.72 0 00-.215.534c0 .213.072.391.215.535a.72.72 0 00.535.215zm0-3.885h6.877a.72.72 0 00.534-.215.72.72 0 00.216-.535.72.72 0 00-.216-.535.72.72 0 00-.534-.215H7.135a.72.72 0 00-.535.216.72.72 0 00-.215.534c0 .213.072.391.215.535a.72.72 0 00.535.215z" fill={color} />
     </svg>
   );
@@ -429,11 +410,11 @@ function WrapUpNotice({
   const onlyMe = myWrapUp && !partnerWrapUp;
 
   return (
-    <div className="flex flex-col gap-4 px-6">
+    <div className="flex flex-col gap-4">
       {onlyPartner && (
         <div className="flex items-start gap-2">
-          <WrapUpIcon color="#8a8a8a" />
-          <p className="text-sm leading-[1.5] text-[var(--contrast-weak)]">
+          <WrapUpIcon color="#a1a1a1" />
+          <p className="msg-text text-muted-foreground">
             {partnerName} has indicated that they are ready to{" "}
             <span className="font-bold">wrap up</span> this conversation. When
             you&apos;re ready to end, you can also{" "}
@@ -443,8 +424,8 @@ function WrapUpNotice({
       )}
       {onlyMe && (
         <div className="flex items-start gap-2">
-          <WrapUpIcon color="#8a8a8a" />
-          <p className="text-sm leading-[1.5] text-[var(--contrast-weak)]">
+          <WrapUpIcon color="#a1a1a1" />
+          <p className="msg-text text-muted-foreground">
             You have indicated that you are ready to{" "}
             <span className="font-bold">wrap up</span>. Waiting for{" "}
             {partnerName} to also wrap up to receive a conclusion.
@@ -452,9 +433,9 @@ function WrapUpNotice({
         </div>
       )}
       {bothWrapUp && (
-        <div className="flex items-start gap-2">
-          <WrapUpIcon color="var(--damson-500)" />
-          <p className="text-sm leading-[1.5] text-[var(--damson-500)]">
+        <div className="flex items-start gap-2 text-foreground">
+          <WrapUpIcon color="currentColor" />
+          <p className="msg-text text-foreground">
             Both parties are ready to wrap up. Synthesizing this chat into a
             conclusion
           </p>
@@ -478,6 +459,7 @@ export default function RoomPage({
     state: sessionState,
     roomState,
     messages,
+    intakeMessages,
     typing,
     error,
     canSend,
@@ -491,6 +473,17 @@ export default function RoomPage({
     raiseHand,
     endSession,
   } = useSession(roomId);
+  const [tab, setTab] = useState<PhaseView>("room");
+
+  // The tab follows the room's real phase; the participant can then step back
+  // and forth between their private room and the commons on their own.
+  const livePhase: PhaseView =
+    roomState?.phase === "commons" || roomState?.phase === "conclusion"
+      ? "commons"
+      : "room";
+  useEffect(() => {
+    setTab(livePhase);
+  }, [livePhase]);
   const [view, setViewRaw] = useState<ViewState>(
     isCreator ? "joining" : "splash"
   );
@@ -593,6 +586,13 @@ export default function RoomPage({
       : roomState.partnerBReady;
   }, [roomState]);
 
+  const partnerReady = useMemo(() => {
+    if (!roomState || roomState.phase !== "intake") return false;
+    return roomState.participantRole === "partner_a"
+      ? roomState.partnerBReady
+      : roomState.partnerAReady;
+  }, [roomState]);
+
   const partnerName = useMemo(() => {
     if (!roomState) return null;
     return roomState.participantRole === "partner_a"
@@ -641,14 +641,14 @@ export default function RoomPage({
   // Screen 2: Name entry
   if (view === "name") {
     return (
-      <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-[#fcfcfc]" style={pageTransition}>
+      <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-[#ffffff]" style={pageTransition}>
         <div className="px-6 pt-6">
           <button
             onClick={() => setView("splash")}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f1f0ed]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f5f5f5]"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12.5 15L7.5 10L12.5 5" stroke="#282828" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12.5 15L7.5 10L12.5 5" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
         </div>
@@ -657,13 +657,13 @@ export default function RoomPage({
           <h1 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
             To begin with,
           </h1>
-          <p className="font-body text-[16px] font-normal leading-[1.5] text-[#4a4a4a]">
+          <p className="font-body text-[16px] font-normal leading-[1.5] text-[#404040]">
             What should Ash call you during the session?
           </p>
         </div>
 
         <div className="relative z-10 mx-auto mt-16 flex w-full max-w-[465px] flex-col gap-3 px-6">
-          <label className="font-body text-[12px] font-medium uppercase leading-[1.2] tracking-[1.25px] text-[#6b6b6b]">
+          <label className="font-body text-[12px] font-medium uppercase leading-[1.2] tracking-[1.25px] text-[#737373]">
             Your name
           </label>
           <input
@@ -672,7 +672,7 @@ export default function RoomPage({
             onKeyDown={(e) => {
               if (e.key === "Enter" && name.trim()) setView("survey-intro");
             }}
-            className="h-[64px] rounded-[16px] bg-[#f1f0ed] px-[24px] font-body text-[16px] text-[#282828] outline-none"
+            className="h-[64px] rounded-[16px] bg-[#f5f5f5] px-[24px] font-body text-[16px] text-[#0a0a0a] outline-none"
             placeholder="Enter your name"
             autoFocus
           />
@@ -699,14 +699,14 @@ export default function RoomPage({
     };
 
     return (
-      <div className="flex min-h-[100dvh] flex-col bg-[#fcfcfc]" style={pageTransition}>
+      <div className="flex min-h-[100dvh] flex-col bg-[#ffffff]" style={pageTransition}>
         <div className="px-6 pt-6">
           <button
             onClick={() => setView("name")}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f1f0ed]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f5f5f5]"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12.5 15L7.5 10L12.5 5" stroke="#282828" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12.5 15L7.5 10L12.5 5" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
         </div>
@@ -715,7 +715,7 @@ export default function RoomPage({
           <h1 className="font-display text-[34px] leading-[1.12] tracking-[-0.01em] text-[var(--contrast-strong)]">
             Alright {name.trim()}, Ash wants to understand your relationship
           </h1>
-          <p className="font-body text-[16px] font-normal leading-[1.5] text-[#4a4a4a]">
+          <p className="font-body text-[16px] font-normal leading-[1.5] text-[#404040]">
             {isSurveyTestVariant() ? "3" : "5"} quick questions help Ash personalize your session. Your responses
             are anonymous and used for research only.
           </p>
@@ -730,7 +730,7 @@ export default function RoomPage({
           </button>
           <button
             onClick={handleSkipSurvey}
-            className="font-body text-[14px] font-bold text-[#6b6b6b]"
+            className="font-body text-[14px] font-bold text-[#737373]"
           >
             skip
           </button>
@@ -814,28 +814,28 @@ export default function RoomPage({
           <h1 className="font-display text-[28px] leading-[1.18] tracking-[-1px] text-[var(--wood-700)]">
             This session has ended
           </h1>
-          <p className="text-[16px] leading-[1.6] text-[#4a4a4a]">
+          <p className="text-[16px] leading-[1.6] text-[#404040]">
             This session is no longer active. If you need support, please reach out to a professional.
           </p>
-          <div className="mt-2 w-full rounded-[16px] bg-[#f3e8e8] p-6 text-left">
-            <p className="mb-3 text-[15px] font-semibold text-[#4a4a4a]">
+          <div className="mt-2 w-full rounded-[16px] bg-[#fef2f2] p-6 text-left">
+            <p className="mb-3 text-[15px] font-semibold text-[#404040]">
               If you or someone you know needs help:
             </p>
             <div className="flex flex-col gap-3">
               <a
                 href="tel:1-800-799-7233"
-                className="text-[15px] font-medium text-[#c0392b] underline"
+                className="text-[15px] font-medium text-[#e7000b] underline"
               >
                 National Domestic Violence Hotline: 1-800-799-7233
               </a>
-              <p className="text-[14px] text-[#4a4a4a]">
+              <p className="text-[14px] text-[#404040]">
                 Or text <span className="font-semibold">START</span> to <span className="font-semibold">88788</span>
               </p>
               <a
                 href="https://www.thehotline.org"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[15px] font-medium text-[#c0392b] underline"
+                className="text-[15px] font-medium text-[#e7000b] underline"
               >
                 www.thehotline.org
               </a>
@@ -865,6 +865,11 @@ export default function RoomPage({
   // Show typing whenever Ash is working: explicit typing state, OR commons loading
   const showTyping = typing || commonsLoading;
 
+  // I've finished my intake but my partner hasn't — hold on a full-screen wait
+  // rather than leaving them in a chat they can no longer type into.
+  const waitingForPartner =
+    roomState.phase === "intake" && myReady && !partnerReady;
+
   // Detect "both ready, waiting for transition" — both ready in intake
   const bothReadyWaiting =
     roomState.phase === "intake" &&
@@ -885,49 +890,75 @@ export default function RoomPage({
     "Preparing your guided conversation...",
   ];
 
+  // Waiting on the other person to finish their private conversation
+  if (waitingForPartner) {
+    return (
+      <TransitionScreen
+        title={`Waiting for ${partnerName || "your partner"} to finish up`}
+        subtitle={`You're ready. As soon as ${partnerName || "your partner"} is done, Ash will bring you both into the commons.`}
+      />
+    );
+  }
+
   // Full-screen transition when entering commons or both ready
   if (commonsLoading || bothReadyWaiting) {
     return (
-      <div className="relative flex h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[var(--surface-bg)]">
-        <div className="animate-fade-in relative z-10 flex flex-col items-center gap-6 text-center">
-          <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 animate-bounce rounded-full bg-[var(--damson-400)] [animation-delay:0ms]" />
-            <span className="h-2.5 w-2.5 animate-bounce rounded-full bg-[var(--damson-400)] [animation-delay:120ms]" />
-            <span className="h-2.5 w-2.5 animate-bounce rounded-full bg-[var(--damson-400)] [animation-delay:240ms]" />
-          </div>
-          <h2
-            key={transitionMsgIndex}
-            className="font-display max-w-[280px] text-center text-[22px] leading-[1.2] tracking-[-0.5px] text-[var(--damson-600)] animate-fade-in"
-          >
-            {transitionMessages[transitionMsgIndex]}
-          </h2>
-        </div>
-      </div>
+      <TransitionScreen
+        title={transitionMessages[transitionMsgIndex]}
+        titleKey={transitionMsgIndex}
+      />
     );
   }
 
   // Full-screen transition when conclusion is being generated
   if (conclusionLoading) {
     return (
-      <div className="relative flex h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[var(--surface-bg)]">
-        <div className="animate-fade-in relative z-10 flex flex-col items-center gap-6 text-center">
-          <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 animate-bounce rounded-full bg-[var(--damson-400)] [animation-delay:0ms]" />
-            <span className="h-2.5 w-2.5 animate-bounce rounded-full bg-[var(--damson-400)] [animation-delay:120ms]" />
-            <span className="h-2.5 w-2.5 animate-bounce rounded-full bg-[var(--damson-400)] [animation-delay:240ms]" />
-          </div>
-          <h2
-            className="font-display max-w-[280px] text-center text-[22px] leading-[1.2] tracking-[-0.5px] text-[var(--damson-600)]"
-          >
-            Wrapping up your session
-          </h2>
-          <p className="max-w-[300px] text-sm leading-[1.5] text-[var(--contrast-weak)]">
-            Ash is preparing your summary...
-          </p>
-        </div>
-      </div>
+      <TransitionScreen
+        title="Wrapping up your session"
+        subtitle="Ash is preparing your summary..."
+      />
     );
   }
+
+  // --- Which transcript the header tabs are showing ---
+  // "Live" means the tab matches the room's actual phase; anything else is a
+  // read-back and the composer is closed.
+  const onLiveTab = tab === livePhase;
+  const shownMessages =
+    tab === "commons"
+      ? livePhase === "commons"
+        ? messages
+        : []
+      : livePhase === "commons"
+        ? intakeMessages
+        : messages;
+
+  const waitingOnPartnerTurn =
+    roomState.phase === "commons" &&
+    !!roomState.activeSpeaker &&
+    roomState.activeSpeaker !== "either" &&
+    roomState.activeSpeaker !== roomState.participantRole;
+
+  const notice: { text: string; centered: boolean; showRaiseHand?: boolean } | null =
+    tab === "commons" && livePhase !== "commons"
+      ? {
+          text: `When ${partnerName || "your partner"} is also ready, you'll move into the commons together`,
+          centered: true,
+        }
+      : tab === "room" && livePhase === "commons"
+        ? {
+            text: "This is your private room from earlier. The conversation has moved to the commons.",
+            centered: true,
+          }
+        : onLiveTab && waitingOnPartnerTurn
+          ? {
+              text: myHandRaised
+                ? "Ash knows you'd like to speak"
+                : "It's your partner's turn",
+              centered: false,
+              showRaiseHand: true,
+            }
+          : null;
 
   return (
     <div className="flex h-[100dvh] flex-col bg-[var(--surface-bg)] text-[var(--contrast-strong)]">
@@ -935,6 +966,8 @@ export default function RoomPage({
       <TopBar
         roomState={roomState}
         messages={messages}
+        tab={tab}
+        onTabChange={setTab}
         onReady={ready}
         readyLoading={readyLoading}
         onWrapUp={wrapUp}
@@ -950,15 +983,14 @@ export default function RoomPage({
       ) : null}
 
       <MessageList
-        messages={messages}
-        typing={showTyping}
+        messages={shownMessages}
+        typing={onLiveTab && showTyping}
         containerRef={containerRef}
-        showAuthorLabels={roomState.phase === "commons"}
+        showAuthorLabels={tab === "commons"}
         participantRole={roomState.participantRole}
-        phase={roomState.phase}
+        phase={tab === "commons" ? "commons" : "intake"}
         footer={
-          (partnerWrapUp || myWrapUp) &&
-          roomState.phase === "commons" ? (
+          onLiveTab && (partnerWrapUp || myWrapUp) && roomState.phase === "commons" ? (
             <WrapUpNotice
               partnerName={partnerName || "Your partner"}
               myWrapUp={myWrapUp}
@@ -968,66 +1000,50 @@ export default function RoomPage({
         }
       />
 
-      {/* Commons typing indicator — shown when the other user is the active speaker */}
-      {roomState.phase === "commons" &&
-        roomState.activeSpeaker &&
-        roomState.activeSpeaker !== "either" &&
-        roomState.activeSpeaker !== roomState.participantRole && (
-          <div className="mx-auto flex w-full max-w-[600px] items-center gap-1.5 px-8 pb-0 pt-1">
-            <span className="text-sm text-[var(--contrast-weak)]">
-              {partnerName || "Your partner"} is typing
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[var(--contrast-weak)] [animation-delay:0ms]" />
-              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[var(--contrast-weak)] [animation-delay:120ms]" />
-              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[var(--contrast-weak)] [animation-delay:240ms]" />
-            </span>
-          </div>
-        )}
-
-      {myReady && roomState.phase === "intake" ? (
-        <StatusBottomBar
-          message={`When ${partnerName || "your partner"} is also ready, you'll move into the commons together`}
-        />
-      ) : roomState.phase === "commons" &&
-        roomState.activeSpeaker &&
-        roomState.activeSpeaker !== "either" &&
-        roomState.activeSpeaker !== roomState.participantRole ? (
-        <div className="border-t border-[var(--surface-elevated)] bg-[var(--surface-bg)] px-4 pb-12 pt-5 lg:pb-6">
-          <div className="mx-auto flex max-w-[600px] items-center justify-between">
-            <p className="text-base leading-[1.5] text-[var(--contrast-weak)]">
-              {myHandRaised
-                ? "Ash knows you'd like to speak"
-                : "Ash invited your partner to speak next"}
+      {/* One status line sits directly above the input */}
+      {notice ? (
+        <div className="mx-auto w-full max-w-[610px] px-5 pb-1">
+          {notice.centered ? (
+            <p className="msg-text text-center font-medium text-[var(--switch-inactive)]">
+              {notice.text}
             </p>
-            {!myHandRaised ? (
-              <button
-                onClick={raiseHand}
-                disabled={handRaiseLoading}
-                className="flex shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[var(--surface-elevated)] px-4 py-2.5 text-sm font-semibold leading-[1.2] tracking-[-0.25px] text-[var(--damson-700)] transition-opacity disabled:opacity-60"
-              >
-                <HandRaiseIcon color="var(--damson-700)" />
-                Raise my hand
-              </button>
-            ) : (
-              <div className="flex shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[var(--damson-600)] px-4 py-2.5 text-sm font-semibold leading-[1.2] tracking-[-0.25px] text-[var(--wood-50)]">
-                <HandRaiseIcon color="var(--wood-50)" />
-                Hand raised
-              </div>
-            )}
-          </div>
+          ) : (
+            <div className="flex items-center justify-between gap-3">
+              <p className="msg-text flex items-center gap-2 text-[var(--switch-inactive)]">
+                <HourglassIcon size={20} />
+                {notice.text}
+              </p>
+              {notice.showRaiseHand ? (
+                !myHandRaised ? (
+                  <button
+                    onClick={raiseHand}
+                    disabled={handRaiseLoading}
+                    className="ui-text flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[var(--bubble)] px-3.5 font-medium text-[var(--chip-foreground)] transition-colors hover:bg-[#e6e6e6] disabled:opacity-60"
+                  >
+                    <HandRaiseIcon color="currentColor" />
+                    Raise my hand
+                  </button>
+                ) : (
+                  <div className="ui-text flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[var(--action)] px-3.5 font-medium text-[var(--action-foreground)]">
+                    <HandRaiseIcon color="currentColor" />
+                    Hand raised
+                  </div>
+                )
+              ) : null}
+            </div>
+          )}
         </div>
-      ) : (
-        <ChatInput
-          disabled={!canSend}
-          placeholder={placeholder}
-          phase={roomState.phase}
-          onSend={(content) => {
-            scrollToBottom();
-            return send(content);
-          }}
-        />
-      )}
+      ) : null}
+
+      <ChatInput
+        disabled={!onLiveTab || !canSend}
+        placeholder={onLiveTab ? placeholder : "Text input"}
+        phase={roomState.phase}
+        onSend={(content) => {
+          scrollToBottom();
+          return send(content);
+        }}
+      />
     </div>
   );
 }

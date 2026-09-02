@@ -27,8 +27,8 @@ export default function MessageList({
 }: MessageListProps) {
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden">
-      <div ref={containerRef} className="flex-1 overflow-y-auto px-0 pt-6 pb-0">
-        <div className="mx-auto flex max-w-[600px] flex-col gap-6 pb-6">
+      <div ref={containerRef} className="flex flex-1 flex-col overflow-y-auto px-0 pt-6 pb-0">
+        <div className="mx-auto mt-auto flex w-full max-w-[610px] flex-col gap-8 px-5 pb-4">
           {messages.map((message) => (
             <MessageBubble
               key={message.id}
@@ -40,7 +40,7 @@ export default function MessageList({
           ))}
           {footer}
           {typing ? (
-            <div className="flex justify-start px-4 py-2">
+            <div className="flex justify-start py-1">
               <TypingIndicator />
             </div>
           ) : null}
