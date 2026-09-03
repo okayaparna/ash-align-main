@@ -94,10 +94,6 @@ async function getRoom(db: SupabaseClient, roomId: string): Promise<Room> {
   return data as Room;
 }
 
-async function getRoomForParticipant(db: SupabaseClient, participantId: string): Promise<Room> {
-  const participant = await getParticipant(db, participantId);
-  return getRoom(db, participant.room_id);
-}
 
 async function getParticipants(db: SupabaseClient, roomId: string): Promise<Participant[]> {
   const { data } = await db

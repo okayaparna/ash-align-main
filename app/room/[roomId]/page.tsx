@@ -9,6 +9,7 @@ import type { ChatMessage, RoomState } from "@/lib/types";
 
 import Image from "next/image";
 import AshWordmark from "@/components/AshWordmark";
+import Link from "next/link";
 import InfoScreen from "@/components/InfoScreen";
 import { PixelCurtain, PixelMosaic } from "@/components/PixelLoader";
 import ChatInput from "@/components/ChatInput";
@@ -492,7 +493,6 @@ export default function RoomPage({
   const enteredChat = useRef(false);
   const lastPhase = useRef<string | null>(null);
   const [name, setName] = useState(isCreator && urlName ? urlName : "");
-  const [creatorName, setCreatorName] = useState<string | null>(null);
   const [toastVisible, setToastVisible] = useState(false);
 
   const setView = useCallback((next: ViewState) => {
@@ -542,17 +542,6 @@ export default function RoomPage({
     setToastVisible(true);
     setTimeout(() => setToastVisible(false), 2000);
   }, [roomId]);
-
-  // Fetch room info for joiner to show creator name
-  useEffect(() => {
-    if (isCreator) return;
-    fetch(`/api/room/info?roomId=${roomId}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.creatorName) setCreatorName(data.creatorName);
-      })
-      .catch(() => {});
-  }, [roomId, isCreator]);
 
   // Sync view state with session state
   useEffect(() => {
@@ -635,12 +624,6 @@ export default function RoomPage({
       : roomState.partnerBHandRaised;
   }, [roomState]);
 
-  const partnerHandRaised = useMemo(() => {
-    if (!roomState || roomState.phase !== "commons") return false;
-    return roomState.participantRole === "partner_a"
-      ? roomState.partnerBHandRaised
-      : roomState.partnerAHandRaised;
-  }, [roomState]);
 
   // Screen 1: Welcome splash (animated)
   if (view === "splash") {
@@ -828,12 +811,12 @@ export default function RoomPage({
           >
             Try again
           </button>
-          <a
+          <Link
             href="/"
             className="mt-1 text-sm font-medium text-[var(--contrast-weak)] underline underline-offset-2"
           >
             Start a new session
-          </a>
+          </Link>
         </div>
       </div>
     );

@@ -9,7 +9,6 @@ interface PostSurveyProps {
 }
 
 function LikertScale({
-  name,
   value,
   onChange,
 }: {

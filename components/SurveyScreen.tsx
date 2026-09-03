@@ -127,8 +127,6 @@ function RatingInput({
 
 export default function SurveyScreen({
   surveyId,
-  title,
-  subtitle,
   questions,
   onComplete,
   onBack,

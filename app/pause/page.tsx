@@ -9,7 +9,7 @@ const INIT = "INIT";
 const SUBMITTING = "SUBMITTING";
 const ERROR = "ERROR";
 const SUCCESS = "SUCCESS";
-const formStates = [INIT, SUBMITTING, ERROR, SUCCESS] as const;
+type FormState = typeof INIT | typeof SUBMITTING | typeof ERROR | typeof SUCCESS;
 
 const formStyles = {
   id: "cltct64b6003l3ri5i8x0ueud",
@@ -38,7 +38,7 @@ function isValidEmail(email: string) {
 function LoopsSignUpForm() {
   const posthog = usePostHog();
   const [email, setEmail] = useState("");
-  const [formState, setFormState] = useState<typeof formStates[number]>(INIT);
+  const [formState, setFormState] = useState<FormState>(INIT);
   const [errorMessage, setErrorMessage] = useState("");
 
   const resetForm = () => {

@@ -35,7 +35,6 @@ const LIKERT_LABELS = [
 ];
 
 function RadioGroup({
-  name,
   options,
   value,
   onChange,
@@ -103,7 +102,6 @@ function RadioGroup({
 }
 
 function LikertScale({
-  name,
   value,
   onChange,
 }: {
