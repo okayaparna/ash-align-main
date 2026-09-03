@@ -271,12 +271,12 @@ second read of the same `messages` table filtered by `intake_participant_id`.
 The composer is closed on any tab that isn't the live phase.
 
 ### Dead code
-`components/BrushBackground.tsx` and `components/FlowBackground.tsx` (p5.js
-generative art, old green/brown palette) are **no longer imported anywhere**.
-They survive the palette change only because nothing renders them.
-
 `app/uipreview/page.tsx` is a standalone mockup with its own private palette. It
 is untouched, kept as a record of a previous design direction.
+
+(`BrushBackground.tsx` and `FlowBackground.tsx` — p5.js generative art on the
+old green/brown palette — were deleted once the meadowell port made them
+unreachable as well as unused.)
 
 
 ## Figma Reference
